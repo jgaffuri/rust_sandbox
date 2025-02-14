@@ -1,8 +1,3 @@
-//https://stevedonovan.github.io/rust-gentle-intro/1-basics.html
-//EN: https://doc.rust-lang.org/stable/book/
-//FR: https://jimskapt.github.io/rust-book-fr/
-
-
 use rusqlite::{Connection, Result};
 use geo::{Geometry, Point, LineString, Polygon};
 
