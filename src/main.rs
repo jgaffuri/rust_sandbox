@@ -1,5 +1,6 @@
 //https://stevedonovan.github.io/rust-gentle-intro/1-basics.html
-//https://doc.rust-lang.org/stable/book/
+//EN: https://doc.rust-lang.org/stable/book/
+//FR: https://jimskapt.github.io/rust-book-fr/
 
 
 use rusqlite::{Connection, Result};
