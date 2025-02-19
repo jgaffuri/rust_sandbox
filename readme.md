@@ -22,6 +22,7 @@ https://crates.io/
 
 Graph
 
+- https://crates.io/crates/petgraph
 - https://crates.io/crates/path-finding
 - https://crates.io/crates/hierarchical_pathfinding
 
