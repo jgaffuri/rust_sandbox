@@ -7,3 +7,4 @@ edition = "2021"
 rusqlite = { version = "0.29", features = ["bundled"] }
 geo = "0.26"
 wkb = "0.6"
+rand = "0.8.0"
