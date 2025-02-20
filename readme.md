@@ -13,6 +13,7 @@ Some rust tests. Or rest tusts.
 ## Base commands
 
 cargo new hello_world
+cargo check
 cargo build
 cargo run
 
