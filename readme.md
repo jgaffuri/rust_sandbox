@@ -16,6 +16,7 @@ cargo new hello_world
 cargo check
 cargo build
 cargo run
+cargo build --release
 
 ## Crates
 
