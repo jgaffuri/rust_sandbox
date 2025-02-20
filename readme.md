@@ -20,7 +20,11 @@ cargo build
 cargo run
 cargo build --release
 
+update all dependencies:
 cargo update
+
+generate and open documentation of the project and its dependencies:
+cargo doc --open
 
 ## Crates
 
