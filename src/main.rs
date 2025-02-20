@@ -1,3 +1,4 @@
+use std::io;
 use rusqlite::{Connection, Result};
 use geo::{Geometry, Point, LineString, Polygon};
 

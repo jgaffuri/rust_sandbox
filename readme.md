@@ -12,11 +12,15 @@ Some rust tests. Or rest tusts.
 
 ## Base commands
 
+rustup doc
+
 cargo new hello_world
 cargo check
 cargo build
 cargo run
 cargo build --release
+
+cargo update
 
 ## Crates
 
