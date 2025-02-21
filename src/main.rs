@@ -34,6 +34,12 @@ fn main() {
     }
 }
 
+/*
+fn plus_one(x: i32) -> i32 {
+    x + 1
+    //return x + 1;
+}*/
+
 
 
 /*
@@ -51,7 +57,7 @@ fn main() {
     for i in 0..5 {
         let even_odd = if i % 2 == 0 {"even"} else {"odd"};
         println!("{} {}", even_odd, i);
-        
+
     }
     for e in 2..3 {
         let mut ddd = "453FDS"
@@ -67,7 +73,7 @@ fn main() {
         println!("{}", i)
         //std::borrow
     }
-    
+
     println!("Hello, world!");
     println!("{}", FFF)
 }
