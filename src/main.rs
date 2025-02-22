@@ -36,6 +36,9 @@ fn main() {
 
 
 
+
+
+/*
 struct User {
     active: bool,
     username: String,
@@ -52,6 +55,7 @@ fn build_user(email: String, username: String) -> User {
         sign_in_count: 1,
     }
 }
+*/
 
 
 
