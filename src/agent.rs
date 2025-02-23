@@ -6,6 +6,13 @@ struct Agent {
 }
 
 impl Agent {
+
+    fn Agent(satisfaction: i16) -> Self {
+        Self {
+            satisfaction: satisfaction
+        }
+    }
+
     fn compute_satisfaction(& mut self) -> () {
         self.statisfaction = 1000
     }
@@ -13,3 +20,5 @@ impl Agent {
 
 
 //fn main() {}
+
+
