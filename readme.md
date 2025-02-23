@@ -29,10 +29,12 @@ cargo doc --open
 
 ## Crates
 
-
+crate roots:
 src/main.rs
 src/lib.rs
+
 src/bin/x.rs
+
 
 
 https://crates.io/
