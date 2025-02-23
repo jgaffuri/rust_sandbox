@@ -45,3 +45,6 @@ Graph
 - https://crates.io/crates/path-finding
 - https://crates.io/crates/hierarchical_pathfinding
 
+## Conventions
+
+https://rust-lang.github.io/api-guidelines/
