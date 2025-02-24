@@ -1,11 +1,64 @@
 use gdal::Dataset;
-//use gdal::vector::LayerAccess;
+use gdal::vector::LayerAccess;
+use geo::{Geometry, LineString, MultiLineString, MultiPolygon, Polygon, Contains};
+use std::path::Path;
+
 
 fn main() {
 
-    let ds= Dataset::open("/home/juju/geodata/gisco/CNTR_RG_03M_2024_3035.gpkg");
-    println!("{}", ds.is_ok());
+    let gpkg_path = "/home/juju/geodata/gisco/CNTR_RG_03M_2024_3035.gpkg";
+    //let bbox = (0.0, 0.0, 10.0, 10.0); // Bounding box: (min_x, min_y, max_x, max_y)
 
+    // Open the GeoPackage file
+    let dataset = Dataset::open(Path::new(gpkg_path)).expect("Failed to open GeoPackage");
+
+    // Get the first vector layer
+    let mut layer = dataset.layer(0).expect("Failed to access layer");
+    println!("Using layer: {}", layer.name());
+
+    // Display attribute names
+    //let fields: Vec<String> = layer.defn().fields().iter().map(|f| f.name().to_string()).collect();
+    //println!("Attributes: {:?}", fields);
+
+    // Create bounding box geometry for filtering
+    //let bbox_geom = geo::Rect::new((bbox.0, bbox.1).into(), (bbox.2, bbox.3).into());
+
+    // Iterate over features
+    for feature in layer.features() {
+        // Get geometry
+        if let Some(gdal_geom) = feature.geometry() {
+            if let Ok(geo_geom) = gdal_geom.to_geo() {
+                // Check if feature is inside the bounding box
+                //if bbox_geom.contains(&geo_geom) {
+                    // Extract "myatt" value
+                    /*if let Some(myatt_value) = feature.field("myatt") {
+                        println!("myatt: {:?}", myatt_value);
+                    }*/
+
+                    // Count vertices in geometry
+                    let vertex_count = count_vertices(&geo_geom);
+                    println!("Number of vertices: {}", vertex_count);
+                //}
+            }
+        }
+    }
+
+}
+
+
+
+
+// Function to count vertices in geometries
+fn count_vertices(geometry: &Geometry<f64>) -> usize {
+    match geometry {
+        Geometry::Point(_) => 1,
+        Geometry::LineString(ls) => ls.0.len(),
+        Geometry::Polygon(poly) => poly.exterior().0.len() + poly.interiors().iter().map(|r| r.0.len()).sum::<usize>(),
+        Geometry::MultiPoint(mp) => mp.0.len(),
+        Geometry::MultiLineString(mls) => mls.0.iter().map(|ls| ls.0.len()).sum(),
+        Geometry::MultiPolygon(mpoly) => mpoly.0.iter().map(|p| count_vertices(&Geometry::Polygon(p.clone()))).sum(),
+        _ => 0,
+    }
 }
 
 
