@@ -1,10 +1,25 @@
+use gdal::Dataset;
+//use gdal::vector::LayerAccess;
+
+fn main() {
+
+    let ds= Dataset::open("/home/juju/geodata/gisco/CNTR_RG_03M_2024_3035.gpkg");
+    println!("{}", ds.is_ok());
+
+}
+
+
+
+
+
+
+
+
 //use rand::Rng;
 //use std::cmp::Ordering;
 //use std::io;
 
-fn main() {
-    println!("AAA");
-}
+
 
 /*
 
