@@ -25,6 +25,15 @@ fn main() {
 
     // Iterate over features
     for feature in layer.features() {
+
+        //let nbf = feature.field_count();
+        let fv = feature.field("CNTR_NAME");
+        println!("{:?}", fv);
+        //println!("{nbf}");
+        if let Ok(Some(cn)) = fv {
+            println!("{:?}", cn);
+        }
+
         // Get geometry
         if let Some(gdal_geom) = feature.geometry() {
             if let Ok(geo_geom) = gdal_geom.to_geo() {
