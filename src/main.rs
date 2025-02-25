@@ -9,11 +9,14 @@ fn main() -> Result<(), gdal::errors::GdalError> {
 
     //read_gpkg("/home/juju/geodata/gisco/CNTR_RG_03M_2024_3035.gpkg", false);
 
-    // Register all GDAL drivers
-    //gdal::gdal_all_register();
+    write_gpkg("/home/juju/Bureau/rust_test.gpkg", "my_layer")
 
-    let gpkg_path = "/home/juju/Bureau/rust_test.gpkg";
-    let layer_name = "my_layer";
+
+}
+
+
+
+fn write_gpkg(gpkg_path: &str, layer_name: &str) -> Result<(), gdal::errors::GdalError> {
 
     // Get the GeoPackage driver
     let driver = DriverManager::get_driver_by_name("GPKG")?;
@@ -22,7 +25,7 @@ fn main() -> Result<(), gdal::errors::GdalError> {
     //TODO test working in memory and then saving in gpkg file ?
     let mut dataset = driver.create(gpkg_path, 0, 0, 0)?;
 
-    // Create a new layer
+    // Create layer
     let mut layer = dataset.create_layer(LayerOptions {
         name: layer_name,
         srs: Some(&SpatialRef::from_epsg(4326).unwrap()),
@@ -30,32 +33,17 @@ fn main() -> Result<(), gdal::errors::GdalError> {
         ..Default::default()
     }).unwrap();
 
-    //layer.set_description("This is my layer!")?;
-
     // Define fields for the layer
     let field_def = FieldDefn::new("name", OGRFieldType::OFTString)?;
     field_def.add_to_layer(&layer)?;
-    //layer.create_field(&field_def)?;
 
+    // Add dummy feature to the layer
     let geometry = Geometry::from_wkt("POINT(6 10)")?;
-    //let geometry = Geometry::wkb(&self);
-    //new_wkb_point(1.0, 2.0)?;
-
-    // Create a dummy feature
-    // Add the feature to the layer
-    //layer.create_feature(geometry)?;
     let fv = FieldValue::StringValue("dkfhdskjfhds".to_string());
     layer.create_feature_fields(geometry, &[&"name"], &[fv])?;
 
-    //let feature = Feature::new(layer.defn())?;
-    //let geometry = Geometry::new_wkb_point(1.0, 2.0)?;
-    //feature.set_geometry(&geometry);
-    //feature.set_field("name", "Dummy Feature");
-
     Ok(())
-
 }
-
 
 
 fn read_gpkg(gpkg_path: &str, show_features: bool) -> Result<(), gdal::errors::GdalError> {
