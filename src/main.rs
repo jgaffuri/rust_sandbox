@@ -1,6 +1,6 @@
 use gdal::spatial_ref::SpatialRef;
 use gdal::{Dataset,Metadata,DriverManager};
-use gdal::vector::{Feature, FieldDefn, Geometry, LayerAccess, LayerOptions, OGRFieldType};
+use gdal::vector::{Feature, FieldDefn, FieldValue, Geometry, LayerAccess, LayerOptions, OGRFieldType};
 use gdal::vector::geometry_type_to_name;
 use gdal::vector::OGRwkbGeometryType::wkbPoint;
 
@@ -43,7 +43,9 @@ fn main() -> Result<(), gdal::errors::GdalError> {
 
     // Create a dummy feature
     // Add the feature to the layer
-    layer.create_feature(geometry)?;
+    //layer.create_feature(geometry)?;
+    let fv = FieldValue::StringValue("dkfhdskjfhds".to_string());
+    layer.create_feature_fields(geometry, &[&"name"], &[fv])?;
 
     //let feature = Feature::new(layer.defn())?;
     //let geometry = Geometry::new_wkb_point(1.0, 2.0)?;
