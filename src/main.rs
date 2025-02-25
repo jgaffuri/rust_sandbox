@@ -5,9 +5,8 @@ use gdal::vector::geometry_type_to_name;
 
 fn main() -> Result<(), gdal::errors::GdalError> {
 
-    scan_gpkg("/home/juju/geodata/gisco/CNTR_RG_03M_2024_3035.gpkg")
+    scan_gpkg("/home/juju/geodata/gisco/CNTR_RG_03M_2024_3035.gpkg", false)
 
-    Ok(())
 }
 
 
