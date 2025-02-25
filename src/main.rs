@@ -1,6 +1,6 @@
 use gdal::spatial_ref::SpatialRef;
 use gdal::{Dataset,Metadata,DriverManager};
-use gdal::vector::{FieldDefn, OGRFieldType, LayerAccess, LayerOptions};
+use gdal::vector::{Feature, FieldDefn, Geometry, LayerAccess, LayerOptions, OGRFieldType};
 use gdal::vector::geometry_type_to_name;
 use gdal::vector::OGRwkbGeometryType::wkbPoint;
 
@@ -23,7 +23,7 @@ fn main() -> Result<(), gdal::errors::GdalError> {
     let mut dataset = driver.create(gpkg_path, 0, 0, 0)?;
 
     // Create a new layer
-    let layer = dataset.create_layer(LayerOptions {
+    let mut layer = dataset.create_layer(LayerOptions {
         name: layer_name,
         srs: Some(&SpatialRef::from_epsg(4326).unwrap()),
         ty: wkbPoint,
@@ -34,9 +34,21 @@ fn main() -> Result<(), gdal::errors::GdalError> {
 
     // Define fields for the layer
     let field_def = FieldDefn::new("name", OGRFieldType::OFTString)?;
+    field_def.add_to_layer(&layer)?;
+    //layer.create_field(&field_def)?;
 
-    layer.start_transaction()?;
-    layer.create_field(&field_def)?;
+    let geometry = Geometry::from_wkt("POINT(6 10)")?;
+    //let geometry = Geometry::wkb(&self);
+    //new_wkb_point(1.0, 2.0)?;
+
+    // Create a dummy feature
+    // Add the feature to the layer
+    layer.create_feature(geometry)?;
+
+    //let feature = Feature::new(layer.defn())?;
+    //let geometry = Geometry::new_wkb_point(1.0, 2.0)?;
+    //feature.set_geometry(&geometry);
+    //feature.set_field("name", "Dummy Feature");
 
     Ok(())
 
