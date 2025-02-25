@@ -4,7 +4,15 @@ use gdal::vector::LayerAccess;
 use gdal::vector::geometry_type_to_name;
 
 fn main() -> Result<(), gdal::errors::GdalError> {
-    let gpkg_path = "/home/juju/geodata/gisco/CNTR_RG_03M_2024_3035.gpkg";
+
+    scan_gpkg("/home/juju/geodata/gisco/CNTR_RG_03M_2024_3035.gpkg")
+
+    Ok(())
+}
+
+
+fn scan_gpkg(gpkg_path: &str, show_features: bool) -> Result<(), gdal::errors::GdalError> {
+
     let dataset = Dataset::open(gpkg_path)?;
     println!("Dataset description: {}", dataset.description()?);
     let layer_count = dataset.layer_count();
@@ -13,26 +21,30 @@ fn main() -> Result<(), gdal::errors::GdalError> {
     let feature_count = layer.feature_count();
     println!("Layer name='{}', features={}", layer.name(), feature_count);
 
-    /*
-    for feature in layer.features() {
-        // The fid is important in cases where the vector dataset is large can you
-        // need random access.
-        let fid = feature.fid().unwrap_or(0);
-        // Summarize the geometry
-        let geometry = feature.geometry().unwrap();
-        let geom_type = geometry_type_to_name(geometry.geometry_type());
-        let geom_len = geometry.get_point_vec().len();
-        println!("    Feature fid={fid:?}, geometry_type='{geom_type}', geometry_len={geom_len}");
-        // Get all the available fields and print their values
-        for field in feature.fields() {
-            let name = field.0;
-            let value = field.1.and_then(|f| f.into_string()).unwrap_or("".into());
-            println!("      {name}={value}");
+    if show_features {
+        for feature in layer.features() {
+            // The fid is important in cases where the vector dataset is large can you
+            // need random access.
+            let fid = feature.fid().unwrap_or(0);
+            // Summarize the geometry
+            let geometry = feature.geometry().unwrap();
+            let geom_type = geometry_type_to_name(geometry.geometry_type());
+            let geom_len = geometry.get_point_vec().len();
+            println!("    Feature fid={fid:?}, geometry_type='{geom_type}', geometry_len={geom_len}");
+            // Get all the available fields and print their values
+            for field in feature.fields() {
+                let name = field.0;
+                let value = field.1.and_then(|f| f.into_string()).unwrap_or("".into());
+                println!("      {name}={value}");
+            }
         }
-    }*/
+    }
 
     Ok(())
+
 }
+
+
 
 
 
