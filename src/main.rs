@@ -3,14 +3,15 @@ use gdal::{Dataset,Metadata};
 use gdal::vector::LayerAccess;
 use gdal::vector::geometry_type_to_name;
 
-fn main() -> Result<(), gdal::errors::GdalError> {
+fn main() {
 
-    scan_gpkg("/home/juju/geodata/gisco/CNTR_RG_03M_2024_3035.gpkg", false)
+    read_gpkg("/home/juju/geodata/gisco/CNTR_RG_03M_2024_3035.gpkg", true);
 
 }
 
 
-fn scan_gpkg(gpkg_path: &str, show_features: bool) -> Result<(), gdal::errors::GdalError> {
+
+fn read_gpkg(gpkg_path: &str, show_features: bool) -> Result<(), gdal::errors::GdalError> {
 
     let dataset = Dataset::open(gpkg_path)?;
     println!("Dataset description: {}", dataset.description()?);
