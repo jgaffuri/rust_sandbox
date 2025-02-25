@@ -1,8 +1,46 @@
+use gdal::{Dataset,Metadata};
+// The `LayerAccess` trait enables reading of vector specific fields from the `Dataset`.
+use gdal::vector::LayerAccess;
+use gdal::vector::geometry_type_to_name;
+
+fn main() -> Result<(), gdal::errors::GdalError> {
+    let gpkg_path = "/home/juju/geodata/gisco/CNTR_RG_03M_2024_3035.gpkg";
+    let dataset = Dataset::open(gpkg_path)?;
+    println!("Dataset description: {}", dataset.description()?);
+    let layer_count = dataset.layer_count();
+    println!("Number of layers: {layer_count}");
+    let mut layer = dataset.layer(0)?;
+    let feature_count = layer.feature_count();
+    println!("Layer name='{}', features={}", layer.name(), feature_count);
+
+    /*
+    for feature in layer.features() {
+        // The fid is important in cases where the vector dataset is large can you
+        // need random access.
+        let fid = feature.fid().unwrap_or(0);
+        // Summarize the geometry
+        let geometry = feature.geometry().unwrap();
+        let geom_type = geometry_type_to_name(geometry.geometry_type());
+        let geom_len = geometry.get_point_vec().len();
+        println!("    Feature fid={fid:?}, geometry_type='{geom_type}', geometry_len={geom_len}");
+        // Get all the available fields and print their values
+        for field in feature.fields() {
+            let name = field.0;
+            let value = field.1.and_then(|f| f.into_string()).unwrap_or("".into());
+            println!("      {name}={value}");
+        }
+    }*/
+
+    Ok(())
+}
+
+
+
+/*
 use gdal::Dataset;
 use gdal::vector::LayerAccess;
-use geo::{Geometry, LineString, MultiLineString, MultiPolygon, Polygon, Contains};
-use std::path::Path;
-
+use geo::{Contains, Geometry, LineString, MinimumRotatedRect, MultiLineString, MultiPolygon, Polygon};
+use std::{any::Any, path::Path};
 
 fn main() {
 
@@ -28,7 +66,6 @@ fn main() {
 
         //let nbf = feature.field_count();
         let fv = feature.field("CNTR_NAME");
-        println!("{:?}", fv);
         //println!("{nbf}");
         if let Ok(Some(cn)) = fv {
             println!("{:?}", cn);
@@ -47,6 +84,9 @@ fn main() {
                     // Count vertices in geometry
                     let vertex_count = count_vertices(&geo_geom);
                     println!("Number of vertices: {}", vertex_count);
+
+                    let ty = geo_geom.minimum_rotated_rect();
+                    println!("Geom: {:?}", ty);
                 //}
             }
         }
@@ -71,7 +111,7 @@ fn count_vertices(geometry: &Geometry<f64>) -> usize {
 }
 
 
-
+*/
 
 
 
