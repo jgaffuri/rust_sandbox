@@ -1,16 +1,17 @@
 use gdal::spatial_ref::SpatialRef;
 use gdal::{Dataset,Metadata,DriverManager};
-use gdal::vector::{Feature, FieldDefn, FieldValue, Geometry, LayerAccess, LayerOptions, OGRFieldType};
+use gdal::vector::{Feature, FieldDefn, FieldValue, Geometry, LayerAccess, LayerOptions, OGRFieldType, OGRwkbGeometryType};
 use gdal::vector::geometry_type_to_name;
 use gdal::vector::OGRwkbGeometryType::wkbPoint;
 use geo::{line_string, point, polygon, Point};
+use rand::Error;
 
 
 fn main() -> Result<(), gdal::errors::GdalError> {
 
-    //read_gpkg("/home/juju/geodata/gisco/CNTR_RG_03M_2024_3035.gpkg", false);
+    read_gpkg("/home/juju/geodata/gisco/CNTR_RG_03M_2024_3035.gpkg", false, 0.0, 0.0, 10.0, 10.0)
 
-    write_gpkg("/home/juju/Bureau/rust_test.gpkg", "my_layer")
+    //write_gpkg("/home/juju/Bureau/rust_test.gpkg", "my_layer")
 
 
 }
@@ -41,7 +42,7 @@ fn write_gpkg(gpkg_path: &str, layer_name: &str) -> Result<(), gdal::errors::Gda
     // Add dummy feature to the layer
     //let geometry = Geometry::from_wkt("POINT(6 10)")?;
     let ptg = point! { x: 6.0, y: 10.0 };
-    let geometry = geo_point_to_gdal(&ptg);
+    let geometry = geo_point_to_gdal(&ptg).unwrap();
 
     let fv = FieldValue::StringValue("dkfhdskjfhds".to_string());
     layer.create_feature_fields(geometry, &[&"name"], &[fv])?;
@@ -51,20 +52,26 @@ fn write_gpkg(gpkg_path: &str, layer_name: &str) -> Result<(), gdal::errors::Gda
 
 
 
-fn geo_point_to_gdal(point: &Point<f64>) -> Geometry {
-    let mut geom = Geometry::new(wkbPoint);
-    geom.set_point(0, point.x(), point.y(), 0.0);
-    geom
+fn geo_point_to_gdal(point: &Point<f64>) -> Result<Geometry, gdal::errors::GdalError> {
+    let mut geom = Geometry::empty(OGRwkbGeometryType::wkbPoint)?;
+    geom.add_point_2d((point.x(), point.y()));
+    //geom.set_point(0, point.x(), point.y(), 0.0);
+    Ok(geom)
 }
 
 
-fn read_gpkg(gpkg_path: &str, show_features: bool) -> Result<(), gdal::errors::GdalError> {
+fn read_gpkg(gpkg_path: &str, show_features: bool, min_x: f64, min_y: f64, max_x: f64, max_y: f64) -> Result<(), gdal::errors::GdalError> {
 
     let dataset = Dataset::open(gpkg_path)?;
     println!("Dataset description: {}", dataset.description()?);
     let layer_count = dataset.layer_count();
     println!("Number of layers: {layer_count}");
     let mut layer = dataset.layer(0)?;
+
+    // Set the spatial filter on the layer to the BBOX
+    layer.set_spatial_filter_rect(min_x, min_y, max_x, max_y);
+
+
     let feature_count = layer.feature_count();
     println!("Layer name='{}', features={}", layer.name(), feature_count);
 
