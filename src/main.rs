@@ -1,11 +1,44 @@
-use gdal::{Dataset,Metadata};
-// The `LayerAccess` trait enables reading of vector specific fields from the `Dataset`.
-use gdal::vector::LayerAccess;
+use gdal::spatial_ref::SpatialRef;
+use gdal::{Dataset,Metadata,DriverManager};
+use gdal::vector::{FieldDefn, OGRFieldType, LayerAccess, LayerOptions};
 use gdal::vector::geometry_type_to_name;
+use gdal::vector::OGRwkbGeometryType::wkbPoint;
 
-fn main() {
 
-    read_gpkg("/home/juju/geodata/gisco/CNTR_RG_03M_2024_3035.gpkg", true);
+fn main() -> Result<(), gdal::errors::GdalError> {
+
+    //read_gpkg("/home/juju/geodata/gisco/CNTR_RG_03M_2024_3035.gpkg", false);
+
+    // Register all GDAL drivers
+    //gdal::gdal_all_register();
+
+    let gpkg_path = "/home/juju/Bureau/rust_test.gpkg";
+    let layer_name = "my_layer";
+
+    // Get the GeoPackage driver
+    let driver = DriverManager::get_driver_by_name("GPKG")?;
+
+    // Create a new GeoPackage file
+    //TODO test working in memory and then saving in gpkg file ?
+    let mut dataset = driver.create(gpkg_path, 0, 0, 0)?;
+
+    // Create a new layer
+    let layer = dataset.create_layer(LayerOptions {
+        name: layer_name,
+        srs: Some(&SpatialRef::from_epsg(4326).unwrap()),
+        ty: wkbPoint,
+        ..Default::default()
+    }).unwrap();
+
+    //layer.set_description("This is my layer!")?;
+
+    // Define fields for the layer
+    let field_def = FieldDefn::new("name", OGRFieldType::OFTString)?;
+
+    layer.start_transaction()?;
+    layer.create_field(&field_def)?;
+
+    Ok(())
 
 }
 
