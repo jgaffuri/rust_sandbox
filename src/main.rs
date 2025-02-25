@@ -3,6 +3,7 @@ use gdal::{Dataset,Metadata,DriverManager};
 use gdal::vector::{Feature, FieldDefn, FieldValue, Geometry, LayerAccess, LayerOptions, OGRFieldType};
 use gdal::vector::geometry_type_to_name;
 use gdal::vector::OGRwkbGeometryType::wkbPoint;
+use geo::{line_string, point, polygon, Point};
 
 
 fn main() -> Result<(), gdal::errors::GdalError> {
@@ -38,11 +39,22 @@ fn write_gpkg(gpkg_path: &str, layer_name: &str) -> Result<(), gdal::errors::Gda
     field_def.add_to_layer(&layer)?;
 
     // Add dummy feature to the layer
-    let geometry = Geometry::from_wkt("POINT(6 10)")?;
+    //let geometry = Geometry::from_wkt("POINT(6 10)")?;
+    let ptg = point! { x: 6.0, y: 10.0 };
+    let geometry = geo_point_to_gdal(&ptg);
+
     let fv = FieldValue::StringValue("dkfhdskjfhds".to_string());
     layer.create_feature_fields(geometry, &[&"name"], &[fv])?;
 
     Ok(())
+}
+
+
+
+fn geo_point_to_gdal(point: &Point<f64>) -> Geometry {
+    let mut geom = Geometry::new(wkbPoint);
+    geom.set_point(0, point.x(), point.y(), 0.0);
+    geom
 }
 
 
