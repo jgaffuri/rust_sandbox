@@ -117,6 +117,8 @@ fn read_gpkg(gpkg_path: &str, show_features: bool, min_x: f64, min_y: f64, max_x
 
 
 
+//fn main() -> Result<(), Box<dyn Error>> {
+
 
 /*
 use gdal::Dataset;
