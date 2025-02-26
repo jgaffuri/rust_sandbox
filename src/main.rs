@@ -9,9 +9,9 @@ use rand::Error;
 
 fn main() {
 
-    //read_gpkg("/home/juju/geodata/gisco/CNTR_RG_03M_2024_3035.gpkg", false, 0.0, 0.0, 10.0, 10.0).unwrap()
+    read_gpkg("/home/juju/geodata/gisco/CNTR_RG_03M_2024_3035.gpkg", false, 0.0, 0.0, 10.0, 10.0)
 
-    write_gpkg("/home/juju/Bureau/rust_test.gpkg", "my_layer")
+    //write_gpkg("/home/juju/Bureau/rust_test.gpkg", "my_layer")
 
 }
 
@@ -60,13 +60,13 @@ fn geo_point_to_gdal(point: &Point<f64>) -> Result<Geometry, gdal::errors::GdalE
 }
 
 
-fn read_gpkg(gpkg_path: &str, show_features: bool, min_x: f64, min_y: f64, max_x: f64, max_y: f64) -> Result<(), gdal::errors::GdalError> {
+fn read_gpkg(gpkg_path: &str, show_features: bool, min_x: f64, min_y: f64, max_x: f64, max_y: f64) {
 
-    let dataset = Dataset::open(gpkg_path)?;
-    println!("Dataset description: {}", dataset.description()?);
+    let dataset = Dataset::open(gpkg_path).unwrap();
+    println!("Dataset description: {}", dataset.description().unwrap());
     let layer_count = dataset.layer_count();
     println!("Number of layers: {layer_count}");
-    let mut layer = dataset.layer(0)?;
+    let mut layer = dataset.layer(0).unwrap();
 
     // Set the spatial filter on the layer to the BBOX
     layer.set_spatial_filter_rect(min_x, min_y, max_x, max_y);
@@ -93,8 +93,6 @@ fn read_gpkg(gpkg_path: &str, show_features: bool, min_x: f64, min_y: f64, max_x
             }
         }
     }
-
-    Ok(())
 
 }
 
