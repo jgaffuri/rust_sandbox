@@ -25,14 +25,22 @@ fn write_gpkg(gpkg_path: &str, layer_name: &str) -> Result<(), gdal::errors::Gda
 
     // Create a new GeoPackage file
     //TODO test working in memory and then saving in gpkg file ?
-    let mut dataset = driver.create(gpkg_path, 0, 0, 0)?;
+    let mut dataset = driver.create(gpkg_path, 0, 0, 0).unwrap();
+    .expect("hello.txt should be included in this project");
 
-    /*     let greeting_file_result = File::open("hello.txt");
-
-    let greeting_file = match greeting_file_result {
-        Ok(file) => file,
-        Err(error) => panic!("Problem opening the file: {error:?}"),
-    }; */
+    /*         let greeting_file = File::open("hello.txt").unwrap_or_else(|error| {
+        if error.kind() == ErrorKind::NotFound {
+            File::create("hello.txt").unwrap_or_else(|error| {
+                panic!("Problem creating the file: {error:?}");
+            })
+        } else {
+            panic!("Problem opening the file: {error:?}");
+        }
+    });
+    
+    let greeting_file = File::open("hello.txt").unwrap();
+    
+     */
 
 
     // Create layer
