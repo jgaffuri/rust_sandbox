@@ -7,40 +7,25 @@ use geo::{line_string, point, polygon, Point};
 use rand::Error;
 
 
-fn main() -> Result<(), gdal::errors::GdalError> {
+fn main() {
 
-    read_gpkg("/home/juju/geodata/gisco/CNTR_RG_03M_2024_3035.gpkg", false, 0.0, 0.0, 10.0, 10.0)
+    //read_gpkg("/home/juju/geodata/gisco/CNTR_RG_03M_2024_3035.gpkg", false, 0.0, 0.0, 10.0, 10.0).unwrap()
 
-    //write_gpkg("/home/juju/Bureau/rust_test.gpkg", "my_layer")
-
+    write_gpkg("/home/juju/Bureau/rust_test.gpkg", "my_layer")
 
 }
 
 
 
-fn write_gpkg(gpkg_path: &str, layer_name: &str) -> Result<(), gdal::errors::GdalError> {
+fn write_gpkg(gpkg_path: &str, layer_name: &str) {
 
     // Get the GeoPackage driver
-    let driver = DriverManager::get_driver_by_name("GPKG")?;
+    let driver = DriverManager::get_driver_by_name("GPKG").unwrap();
 
     // Create a new GeoPackage file
     //TODO test working in memory and then saving in gpkg file ?
-    let mut dataset = driver.create(gpkg_path, 0, 0, 0).unwrap();
-    .expect("hello.txt should be included in this project");
-
-    /*         let greeting_file = File::open("hello.txt").unwrap_or_else(|error| {
-        if error.kind() == ErrorKind::NotFound {
-            File::create("hello.txt").unwrap_or_else(|error| {
-                panic!("Problem creating the file: {error:?}");
-            })
-        } else {
-            panic!("Problem opening the file: {error:?}");
-        }
-    });
-    
-    let greeting_file = File::open("hello.txt").unwrap();
-    
-     */
+    let mut dataset = driver.create(gpkg_path, 0, 0, 0)
+    .expect("Cannot create dataset");
 
 
     // Create layer
@@ -52,8 +37,8 @@ fn write_gpkg(gpkg_path: &str, layer_name: &str) -> Result<(), gdal::errors::Gda
     }).unwrap();
 
     // Define fields for the layer
-    let field_def = FieldDefn::new("name", OGRFieldType::OFTString)?;
-    field_def.add_to_layer(&layer)?;
+    let field_def = FieldDefn::new("name", OGRFieldType::OFTString).unwrap();
+    field_def.add_to_layer(&layer).unwrap();
 
     // Add dummy feature to the layer
     //let geometry = Geometry::from_wkt("POINT(6 10)")?;
@@ -61,9 +46,8 @@ fn write_gpkg(gpkg_path: &str, layer_name: &str) -> Result<(), gdal::errors::Gda
     let geometry = geo_point_to_gdal(&ptg).unwrap();
 
     let fv = FieldValue::StringValue("dkfhdskjfhds".to_string());
-    layer.create_feature_fields(geometry, &[&"name"], &[fv])?;
+    layer.create_feature_fields(geometry, &[&"name"], &[fv]).unwrap();
 
-    Ok(())
 }
 
 
