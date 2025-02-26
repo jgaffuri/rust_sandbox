@@ -98,6 +98,16 @@ fn read_gpkg(gpkg_path: &str, show_features: bool, min_x: f64, min_y: f64, max_x
 
 
 
+//traits
+/*
+pub fn notify(item: &(impl Summary + Display)) {
+pub fn notify<T: Summary + Display>(item: &T) {
+    fn some_function<T, U>(t: &T, u: &U) -> i32
+    where
+        T: Display + Clone,
+        U: Clone + Debug,
+    {
+*/
 
 //fn main() -> Result<(), Box<dyn Error>> {
 
