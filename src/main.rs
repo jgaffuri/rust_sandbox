@@ -27,6 +27,14 @@ fn write_gpkg(gpkg_path: &str, layer_name: &str) -> Result<(), gdal::errors::Gda
     //TODO test working in memory and then saving in gpkg file ?
     let mut dataset = driver.create(gpkg_path, 0, 0, 0)?;
 
+    /*     let greeting_file_result = File::open("hello.txt");
+
+    let greeting_file = match greeting_file_result {
+        Ok(file) => file,
+        Err(error) => panic!("Problem opening the file: {error:?}"),
+    }; */
+
+
     // Create layer
     let mut layer = dataset.create_layer(LayerOptions {
         name: layer_name,
