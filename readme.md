@@ -26,6 +26,9 @@ cargo update
 generate and open documentation of the project and its dependencies:
 cargo doc --open
 
+cargo test
+cargo test --help
+
 ## Crates
 
 crate roots:
