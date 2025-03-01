@@ -4,7 +4,6 @@ use gdal::vector::{Feature, FieldDefn, FieldValue, Geometry, LayerAccess, LayerO
 use gdal::vector::geometry_type_to_name;
 use gdal::vector::OGRwkbGeometryType::wkbPoint;
 use geo::{line_string, point, polygon, Point};
-use rand::Error;
 
 
 fn main() {

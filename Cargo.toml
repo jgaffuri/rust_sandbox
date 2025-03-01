@@ -6,4 +6,3 @@ edition = "2021"
 [dependencies]
 gdal = "0.17.1"
 geo = "0.29.3"
-rand = "0.8.0"
