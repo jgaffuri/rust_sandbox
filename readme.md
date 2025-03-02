@@ -33,6 +33,12 @@ Doc with /// and //!
 
 publish on crate.io
 cargo login
+cargo publish
+cargo yank --vers 1.0.1
+cargo yank --vers 1.0.1 --undo
+
+install bin locally:
+cargo install
 
 
 ## Crates
