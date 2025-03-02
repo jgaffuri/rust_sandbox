@@ -8,9 +8,20 @@ use geo::{line_string, point, polygon, Point};
 
 fn main() {
 
-    read_gpkg("/home/juju/geodata/gisco/CNTR_RG_03M_2024_3035.gpkg", false, 0.0, 0.0, 10.0, 10.0)
+    //read_gpkg("/home/juju/geodata/gisco/CNTR_RG_03M_2024_3035.gpkg", false, 0.0, 0.0, 10.0, 10.0)
 
     //write_gpkg("/home/juju/Bureau/rust_test.gpkg", "my_layer")
+
+
+
+
+
+
+}
+
+
+
+fn create_grid() {
 
 }
 
@@ -18,10 +29,8 @@ fn main() {
 
 fn write_gpkg(gpkg_path: &str, layer_name: &str) {
 
-    // Get the GeoPackage driver
     let driver = DriverManager::get_driver_by_name("GPKG").unwrap();
 
-    // Create a new GeoPackage file
     //TODO test working in memory and then saving in gpkg file ?
     let mut dataset = driver.create(gpkg_path, 0, 0, 0)
     .expect("Cannot create dataset");
