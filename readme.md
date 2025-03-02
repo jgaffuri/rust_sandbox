@@ -24,11 +24,16 @@ cargo build --release
 update all dependencies:
 cargo update
 
-generate and open documentation of the project and its dependencies:
-cargo doc --open
-
 cargo test
 cargo test --help
+
+generate and open documentation of the project and its dependencies:
+cargo doc --open
+Doc with /// and //!
+
+publish on crate.io
+cargo login
+
 
 ## Crates
 
