@@ -29,13 +29,13 @@ fn validate_grid() {
 
 
 
-fn load_gpkg_layer<'a>(gpkg_path: &'a str, layer_name: &'a str, min_x: f64, min_y: f64, max_x: f64, max_y: f64) -> Vec<Geometry> {
+fn load_gpkg_layer(gpkg_path: &str, layer_name: &str, min_x: f64, min_y: f64, max_x: f64, max_y: f64) -> Vec<Geometry> {
 
     let dataset: Dataset = Dataset::open(gpkg_path).unwrap();
     println!("Dataset description: {}", dataset.description().unwrap());
     //let layer_count = dataset.layer_count();
     //println!("Number of layers: {layer_count}");
-    let mut layer: Layer<'a> = dataset.layer_by_name(layer_name).unwrap();
+    let mut layer: Layer = dataset.layer_by_name(layer_name).unwrap();
 
     // Set the spatial filter on the layer to the BBOX
     layer.set_spatial_filter_rect(min_x, min_y, max_x, max_y);
