@@ -29,24 +29,27 @@ fn validate_grid() {
 
 
 
-fn load_gpkg_layer<'a>(gpkg_path: &'a str, layer_name: &'a str, min_x: f64, min_y: f64, max_x: f64, max_y: f64) -> Result<Vec<Feature<'a>>, GdalError> {
+fn load_gpkg_layer<'a>(gpkg_path: &'a str, layer_name: &'a str, min_x: f64, min_y: f64, max_x: f64, max_y: f64) -> Vec<Geometry> {
 
-    let dataset = Dataset::open(gpkg_path)?;
-    println!("Dataset description: {}", dataset.description()?);
+    let dataset: Dataset = Dataset::open(gpkg_path).unwrap();
+    println!("Dataset description: {}", dataset.description().unwrap());
     //let layer_count = dataset.layer_count();
     //println!("Number of layers: {layer_count}");
-    let mut layer = dataset.layer_by_name(layer_name)?;
+    let mut layer: Layer<'a> = dataset.layer_by_name(layer_name).unwrap();
 
     // Set the spatial filter on the layer to the BBOX
     layer.set_spatial_filter_rect(min_x, min_y, max_x, max_y);
 
     let mut features = Vec::new();
     for feature in layer.features() {
-        features.push(feature);
+        let geometry = feature.geometry().unwrap().clone();
+        features.push( geometry );
     }
 
-    Ok(features)
+    features
 }
+
+
 
 
 fn read_gpkg(gpkg_path: &str, show_features: bool, min_x: f64, min_y: f64, max_x: f64, max_y: f64) {
