@@ -26,7 +26,7 @@ fn validate_grid() {
         "census2021",
         2233307.0, 3921310.0,
         4006894.9, 2291515.9);
-    println!("Cells {:?}", cells);
+    println!("Cells {:?}", cells.len());
 
 }
 
