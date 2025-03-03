@@ -21,9 +21,12 @@ fn main() {
 fn validate_grid() {
     println!("Validation");
 
-    let layer = load_gpkg_layer("", "", 0.0, 0.0, 999999999.9, 999999999.9);
-
-    println!("Layer {:?}", layer);
+    let cells = load_gpkg_layer(
+        "/home/juju/geodata/census/2021/ESTAT_Census_2021_V2.gpkg",
+        "census2021",
+        2233307.0, 3921310.0,
+        4006894.9, 2291515.9);
+    println!("Cells {:?}", cells);
 
 }
 
