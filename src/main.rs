@@ -4,7 +4,7 @@ use gdal::vector::{Feature, FeatureIterator, FieldDefn, FieldValue, Geometry, La
 use gdal::vector::geometry_type_to_name;
 use gdal::vector::OGRwkbGeometryType::wkbPoint;
 use geo::{line_string, point, polygon, Point};
-
+use gdal::errors::GdalError;
 
 fn main() {
 
@@ -12,11 +12,7 @@ fn main() {
 
     //write_gpkg("/home/juju/Bureau/rust_test.gpkg", "my_layer")
 
-
-
     validate_grid()
-
-
 
 }
 
@@ -32,7 +28,28 @@ fn validate_grid() {
 }
 
 
-fn load_gpkg_layer<'a>(gpkg_path: &'a str, layer_name: &'a str, min_x: f64, min_y: f64, max_x: f64, max_y: f64) -> Vec<Feature<'a>> {
+
+fn load_gpkg_layer<'a>(gpkg_path: &'a str, layer_name: &'a str, min_x: f64, min_y: f64, max_x: f64, max_y: f64) -> Result<Vec<Feature<'a>>, GdalError> {
+
+    let dataset = Dataset::open(gpkg_path)?;
+    println!("Dataset description: {}", dataset.description()?);
+    //let layer_count = dataset.layer_count();
+    //println!("Number of layers: {layer_count}");
+    let mut layer = dataset.layer_by_name(layer_name)?;
+
+    // Set the spatial filter on the layer to the BBOX
+    layer.set_spatial_filter_rect(min_x, min_y, max_x, max_y);
+
+    let mut features = Vec::new();
+    for feature in layer.features() {
+        features.push(feature);
+    }
+
+    Ok(features)
+}
+
+
+fn read_gpkg(gpkg_path: &str, show_features: bool, min_x: f64, min_y: f64, max_x: f64, max_y: f64) {
 
     let dataset = Dataset::open(gpkg_path).unwrap();
     println!("Dataset description: {}", dataset.description().unwrap());
@@ -43,10 +60,30 @@ fn load_gpkg_layer<'a>(gpkg_path: &'a str, layer_name: &'a str, min_x: f64, min_
     // Set the spatial filter on the layer to the BBOX
     layer.set_spatial_filter_rect(min_x, min_y, max_x, max_y);
 
-    layer.features().collect::<Vec<_>>()
+
+    let feature_count = layer.feature_count();
+    println!("Layer name='{}', features={}", layer.name(), feature_count);
+
+    if show_features {
+        for feature in layer.features() {
+            // The fid is important in cases where the vector dataset is large can you
+            // need random access.
+            let fid = feature.fid().unwrap_or(0);
+            // Summarize the geometry
+            let geometry = feature.geometry().unwrap();
+            let geom_type = geometry_type_to_name(geometry.geometry_type());
+            let geom_len = geometry.get_point_vec().len();
+            println!("    Feature fid={fid:?}, geometry_type='{geom_type}', geometry_len={geom_len}");
+            // Get all the available fields and print their values
+            for field in feature.fields() {
+                let name = field.0;
+                let value = field.1.and_then(|f| f.into_string()).unwrap_or("".into());
+                println!("      {name}={value}");
+            }
+        }
+    }
+
 }
-
-
 
 
 fn write_gpkg(gpkg_path: &str, layer_name: &str) {
@@ -89,42 +126,6 @@ fn geo_point_to_gdal(point: &Point<f64>) -> Result<Geometry, gdal::errors::GdalE
     Ok(geom)
 }
 
-
-fn read_gpkg(gpkg_path: &str, show_features: bool, min_x: f64, min_y: f64, max_x: f64, max_y: f64) {
-
-    let dataset = Dataset::open(gpkg_path).unwrap();
-    println!("Dataset description: {}", dataset.description().unwrap());
-    let layer_count = dataset.layer_count();
-    println!("Number of layers: {layer_count}");
-    let mut layer = dataset.layer(0).unwrap();
-
-    // Set the spatial filter on the layer to the BBOX
-    layer.set_spatial_filter_rect(min_x, min_y, max_x, max_y);
-
-
-    let feature_count = layer.feature_count();
-    println!("Layer name='{}', features={}", layer.name(), feature_count);
-
-    if show_features {
-        for feature in layer.features() {
-            // The fid is important in cases where the vector dataset is large can you
-            // need random access.
-            let fid = feature.fid().unwrap_or(0);
-            // Summarize the geometry
-            let geometry = feature.geometry().unwrap();
-            let geom_type = geometry_type_to_name(geometry.geometry_type());
-            let geom_len = geometry.get_point_vec().len();
-            println!("    Feature fid={fid:?}, geometry_type='{geom_type}', geometry_len={geom_len}");
-            // Get all the available fields and print their values
-            for field in feature.fields() {
-                let name = field.0;
-                let value = field.1.and_then(|f| f.into_string()).unwrap_or("".into());
-                println!("      {name}={value}");
-            }
-        }
-    }
-
-}
 
 
 
