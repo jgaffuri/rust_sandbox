@@ -1,6 +1,6 @@
 use gdal::spatial_ref::SpatialRef;
 use gdal::{Dataset,Metadata,DriverManager};
-use gdal::vector::{Feature, FieldDefn, FieldValue, Geometry, Layer, LayerAccess, LayerOptions, OGRFieldType, OGRwkbGeometryType};
+use gdal::vector::{Feature, FeatureIterator, FieldDefn, FieldValue, Geometry, Layer, LayerAccess, LayerOptions, OGRFieldType, OGRwkbGeometryType};
 use gdal::vector::geometry_type_to_name;
 use gdal::vector::OGRwkbGeometryType::wkbPoint;
 use geo::{line_string, point, polygon, Point};
@@ -32,7 +32,7 @@ fn validate_grid() {
 }
 
 
-fn load_gpkg_layer(gpkg_path: &str, layer_name: &str, min_x: f64, min_y: f64, max_x: f64, max_y: f64) -> Layer {
+fn load_gpkg_layer<'a>(gpkg_path: &'a str, layer_name: &'a str, min_x: f64, min_y: f64, max_x: f64, max_y: f64) -> Vec<Feature<'a>> {
 
     let dataset = Dataset::open(gpkg_path).unwrap();
     println!("Dataset description: {}", dataset.description().unwrap());
@@ -43,7 +43,7 @@ fn load_gpkg_layer(gpkg_path: &str, layer_name: &str, min_x: f64, min_y: f64, ma
     // Set the spatial filter on the layer to the BBOX
     layer.set_spatial_filter_rect(min_x, min_y, max_x, max_y);
 
-    layer
+    layer.features().collect::<Vec<_>>()
 }
 
 
