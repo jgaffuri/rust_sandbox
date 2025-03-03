@@ -45,6 +45,7 @@ fn load_gpkg_layer(gpkg_path: &str, layer_name: &str, min_x: f64, min_y: f64, ma
 
     let mut features = Vec::new();
     for feature in layer.features() {
+        println!("{:?}", feature);
         let geometry = feature.geometry().unwrap().clone();
         features.push( geometry );
     }
