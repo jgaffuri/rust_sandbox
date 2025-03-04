@@ -22,7 +22,7 @@ fn validate_grid() {
     println!("Validation");
 
     let cells = load_gpkg_layer(
-        "/home/juju/geodata/census/2021/ESTAT_Census_2021_V2.gpkg",
+        "/home/juju/geodata/census/2021/ESTAT_Census_2021_V2.gpkg",  
         "census2021",
         3921310.0, 2233307.0,
         4006894.9, 2291515.9);
@@ -32,7 +32,11 @@ fn validate_grid() {
 
 
 
-fn load_gpkg_layer(gpkg_path: &str, layer_name: &str, min_x: f64, min_y: f64, max_x: f64, max_y: f64) -> Vec<Geometry> {
+fn load_gpkg_layer(gpkg_path: &str, layer_name: &str, min_x: f64, min_y: f64, max_x: f64, max_y: f64) -> Vec<(Geometry, String)> {
+
+// fid,GRD_ID,T,M,F,Y_LT15,Y_1564,Y_GE65,EMP,NAT,EU_OTH,OTH,SAME,CHG_IN,CHG_OUT,LAND_SURFACE,POPULATED,COUNT,
+// T_CI,M_CI,F_CI,Y_LT15_CI,Y_1564_CI,Y_GE65_CI,EMP_CI,NAT_CI,EU_OTH_CI,OTH_CI,SAME_CI,CHG_IN_CI,CHG_OUT_CI
+
 
     let dataset: Dataset = Dataset::open(gpkg_path).unwrap();
     println!("Dataset description: {}", dataset.description().unwrap());
@@ -43,11 +47,19 @@ fn load_gpkg_layer(gpkg_path: &str, layer_name: &str, min_x: f64, min_y: f64, ma
     // Set the spatial filter on the layer to the BBOX
     layer.set_spatial_filter_rect(min_x, min_y, max_x, max_y);
 
-    let mut features = Vec::new();
+    let mut features: Vec<(Geometry, String)> = Vec::new();
     for feature in layer.features() {
-        println!("{:?}", feature);
-        let geometry = feature.geometry().unwrap().clone();
-        features.push( geometry );
+        //let geometry = feature.geometry().unwrap().clone();
+        //let grd_id = feature.field_as_string_by_name("GRD_ID").unwrap().unwrap();
+        //println!("{}", grd_id);
+        //let f = (geometry, grd_id);
+
+        for field in ["T","M","F","Y_LT15","Y_1564","Y_GE65","EMP","NAT","EU_OTH","OTH","SAME","CHG_IN","CHG_OUT"] {
+            let val: i64 = feature.field_as_integer64_by_name(field).unwrap().unwrap();
+
+        }
+
+        //features.push( f );
     }
 
     features
@@ -73,15 +85,11 @@ fn read_gpkg(gpkg_path: &str, show_features: bool, min_x: f64, min_y: f64, max_x
 
     if show_features {
         for feature in layer.features() {
-            // The fid is important in cases where the vector dataset is large can you
-            // need random access.
             let fid = feature.fid().unwrap_or(0);
-            // Summarize the geometry
             let geometry = feature.geometry().unwrap();
             let geom_type = geometry_type_to_name(geometry.geometry_type());
             let geom_len = geometry.get_point_vec().len();
             println!("    Feature fid={fid:?}, geometry_type='{geom_type}', geometry_len={geom_len}");
-            // Get all the available fields and print their values
             for field in feature.fields() {
                 let name = field.0;
                 let value = field.1.and_then(|f| f.into_string()).unwrap_or("".into());
