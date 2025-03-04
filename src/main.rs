@@ -24,8 +24,10 @@ fn validate_grid() {
     let cells = load_gpkg_layer(
         "/home/juju/geodata/census/2021/ESTAT_Census_2021_V2.gpkg",  
         "census2021",
-        3921310.0, 2233307.0,
-        4006894.9, 2291515.9);
+        //3921310.0, 2233307.0,
+        //4006894.9, 2291515.9);
+        0.0, 0.0,
+        999999999.9, 999999999.9);
     println!("Cells {:?}", cells.len());
 
 }
@@ -50,13 +52,17 @@ fn load_gpkg_layer(gpkg_path: &str, layer_name: &str, min_x: f64, min_y: f64, ma
     let mut features: Vec<(Geometry, String)> = Vec::new();
     for feature in layer.features() {
         //let geometry = feature.geometry().unwrap().clone();
-        //let grd_id = feature.field_as_string_by_name("GRD_ID").unwrap().unwrap();
+        let grd_id = feature.field_as_string_by_name("GRD_ID").unwrap().unwrap();
         //println!("{}", grd_id);
         //let f = (geometry, grd_id);
 
         for field in ["T","M","F","Y_LT15","Y_1564","Y_GE65","EMP","NAT","EU_OTH","OTH","SAME","CHG_IN","CHG_OUT"] {
-            let val: i64 = feature.field_as_integer64_by_name(field).unwrap().unwrap();
-
+            //println!("{field}");
+            let val = feature.field_as_integer64_by_name(field).unwrap();
+             if val==None { continue; }
+            let val2 = val.unwrap();
+            if val2 >=0 || val2==-9999 { continue; }
+            println!("{}", val2);
         }
 
         //features.push( f );
