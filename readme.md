@@ -68,5 +68,3 @@ https://rust-lang.github.io/api-guidelines/
 
 https://rust-gdal-cookbook.dend.ro/2_geometry
 
-
-
