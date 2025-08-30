@@ -18,6 +18,7 @@ fn main() {
 
 
 
+
 fn validate_grid() {
     println!("Validation");
 
