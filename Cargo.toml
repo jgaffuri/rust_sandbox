@@ -12,7 +12,7 @@ name = "geotiff_agg"
 path = "src/main.rs"
 
 [dependencies]
-gdal = "0.17"
+gdal = { version = "0.19", features = ["bindgen"] }
 rstar = "0.12"
 rayon = "1.10"
 csv = "1.3"

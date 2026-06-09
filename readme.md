@@ -24,6 +24,9 @@ cargo build --release
 update all dependencies:
 cargo update
 
+search dependency
+cargo search gdal
+
 cargo test
 cargo test --help
 
