@@ -1,9 +1,11 @@
-use anyhow::Result;
+//use anyhow::Result;
+use anyhow::{anyhow, Result};
 //use gdal::errors::Result;
 use gdal::vector::{Feature, FieldValue, Geometry, LayerAccess, LayerOptions};
 use gdal::{Dataset, DriverManager};
-use geo::{Buffer, Translate};
+use geo::{Buffer, Rect, Translate};
 use std::any::Any;
+use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::ops::Deref;
 
@@ -11,32 +13,24 @@ fn print_type_of<T>(_: &T) {
     println!("{}", std::any::type_name::<T>());
 }
 
-#[derive(Debug)]
-struct FeatureRecord {
-    geometry: geo_types::Geometry<f64>,
-    //TODO make it a hashmap instead
-    fields: Vec<(String, Option<FieldValue>)>,
-}
 
 
 #[derive(Default)]
 pub struct LoadFeaturesOptions<'a> {
     pub layer_name: Option<&'a str>,
-    pub bbox: Option<(f64, f64, f64, f64)>,
+    pub bbox: Option<Rect<f64>>,
     pub attribute_filter: Option<&'a str>,
 }
 
-impl Default for LoadFeaturesOptions<'_> {
-    fn default() -> Self {
-        Self {
-            layer_name: None,
-            bbox: None,
-            attribute_filter: None,
-        }
-    }
+pub struct FeatureRecord {
+    pub geometry: geo_types::Geometry<f64>,
+    pub fields: HashMap<String, Option<FieldValue>>,
 }
 
-pub fn load_features(path: &str, options: LoadFeaturesOptions<'_>) -> Result<Vec<FeatureRecord>> {
+pub fn load_features(
+    path: &str,
+    options: LoadFeaturesOptions<'_>,
+) -> Result<Vec<FeatureRecord>> {
     let dataset = Dataset::open(path)?;
 
     let mut layer = match options.layer_name {
@@ -44,36 +38,31 @@ pub fn load_features(path: &str, options: LoadFeaturesOptions<'_>) -> Result<Vec
         None => dataset.layer(0)?,
     };
 
-    // Apply spatial filter
-    if let Some((minx, miny, maxx, maxy)) = options.bbox {
-        layer.set_spatial_filter_rect(minx, miny, maxx, maxy);
+    if let Some(rect) = options.bbox {
+        layer.set_spatial_filter_rect(
+            rect.min().x,
+            rect.min().y,
+            rect.max().x,
+            rect.max().y,
+        );
     }
 
-    // Apply attribute (SQL WHERE clause) filter
     if let Some(filter) = options.attribute_filter {
         layer.set_attribute_filter(filter)?;
     }
 
-    let mut out = Vec::new();
-
-    for feature in layer.features() {
+    layer.features().map(|feature| {
         let ogr_geom = feature
             .geometry()
             .ok_or_else(|| anyhow!("feature has no geometry"))?;
 
-        let geo_geom = geo_types::Geometry::<f64>::try_from(ogr_geom)
-            .expect("could not convert OGR geometry to geo_types");
-
-        let fields = feature.fields().collect();
-
-        out.push(FeatureRecord {
-            fields,
-            geometry: geo_geom,
-        });
-    }
-
-    Ok(out)
+        Ok(FeatureRecord {
+            geometry: geo_types::Geometry::try_from(ogr_geom)?,
+            fields: feature.fields().collect(),
+        })
+    }).collect()
 }
+
 
 fn main() -> Result<()> {
     let input_path = "/home/juju/geodata/gisco/NUTS_RG_01M_2021_3035.gpkg";
@@ -132,6 +121,7 @@ fn main() -> Result<()> {
         out_layer.create_defn_fields(&[(name.as_str(), *field_type)])?;
     }
 
+    /*
     for record in records {
         let mut feature = Feature::new(out_layer.defn())?;
 
@@ -149,6 +139,7 @@ fn main() -> Result<()> {
     }
 
     println!("Wrote translated features to {}", output_path);
+    */
 
     Ok(())
 }
