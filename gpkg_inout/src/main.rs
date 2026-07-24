@@ -4,6 +4,7 @@ use gdal::{Dataset, DriverManager};
 use geo::{Buffer, Translate};
 use std::any::Any;
 use std::convert::TryFrom;
+use std::ops::Deref;
 
 /// One in-memory copy of a feature: its attribute fields plus its geometry
 /// converted to `geo_types`, which is what lets us use `geo`'s algorithms.
@@ -50,11 +51,11 @@ fn main() -> Result<()> {
 
     println!("Done");
 
-    for f in records {
-        println!("{:?}", f.fields);
+    for mut f in records {
+        println!("{:?}", f.fields.get(0).ok_or("no").unwrap().1.as_ref().ok_or("no").unwrap());
         //println!("{:?}", f.geometry);
         print_type_of(&f.geometry);
-        let buff = f.geometry.buffer(50);
+        f.geometry = geo_types::Geometry::MultiPolygon(f.geometry.buffer(50.0));
     }
 
     Ok(())
