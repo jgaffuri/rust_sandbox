@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+anyhow = "1.0.104"
 #gdal = { version = "0.19.0", features = ["gdal-src"] }
 gdal = "0.19.0"
 gdal-sys = "0.12.0"
