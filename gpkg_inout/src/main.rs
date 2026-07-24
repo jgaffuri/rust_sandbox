@@ -14,17 +14,17 @@ fn print_type_of<T>(_: &T) {
 }
 
 
+pub struct FeatureRecord {
+    pub geometry: geo_types::Geometry<f64>,
+    pub fields: HashMap<String, Option<FieldValue>>,
+}
+
 
 #[derive(Default)]
 pub struct LoadFeaturesOptions<'a> {
     pub layer_name: Option<&'a str>,
     pub bbox: Option<Rect<f64>>,
     pub attribute_filter: Option<&'a str>,
-}
-
-pub struct FeatureRecord {
-    pub geometry: geo_types::Geometry<f64>,
-    pub fields: HashMap<String, Option<FieldValue>>,
 }
 
 pub fn load_features(
@@ -81,7 +81,7 @@ fn main() -> Result<()> {
     println!("Done");
 
     for mut f in records {
-        println!("{:?}", f.fields);
+        println!("{:?}", f.fields.get("NUTS_ID"));
         //println!("{:?}", f.geometry);
         print_type_of(&f.geometry);
         f.geometry = geo_types::Geometry::MultiPolygon(f.geometry.buffer(50.0));
