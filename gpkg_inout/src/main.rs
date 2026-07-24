@@ -65,7 +65,7 @@ pub fn load_features(path: &str, options: LoadFeaturesOptions<'_>) -> Result<Vec
 fn main() -> Result<()> {
     let input_path = "/home/juju/geodata/gisco/NUTS_RG_01M_2021_3035.gpkg";
 
-    let records = load_features(
+    let mut records = load_features(
         input_path,
         LoadFeaturesOptions {
             layer_name: None,
@@ -78,7 +78,7 @@ fn main() -> Result<()> {
 
     println!("Done");
 
-    for mut f in records {
+    for f in &mut records {
         println!(
             "{:?}",
             f.fields
@@ -90,6 +90,8 @@ fn main() -> Result<()> {
         print_type_of(&f.geometry);
         f.geometry = geo_types::Geometry::MultiPolygon(f.geometry.buffer(50.0));
     }
+
+    println!("Modified {} features", records.len());
 
     let output_path = "/home/juju/Bureau/rust_out.gpkg";
     let output_layer_name = "lay";
@@ -125,6 +127,13 @@ fn main() -> Result<()> {
         out_layer.create_defn_fields(&[(name.as_str(), *field_type)])?;
     }
 
+    let field_indices: HashMap<String, usize> = out_layer
+        .defn()
+        .fields()
+        .enumerate()
+        .map(|(i, field)| (field.name(), i))
+        .collect();
+
     for record in records {
         let mut feature = Feature::new(out_layer.defn())?;
 
@@ -134,6 +143,13 @@ fn main() -> Result<()> {
         feature.set_geometry(ggg)?;
 
         for (name, value) in &record.fields {
+            if let (Some(value), Some(&index)) = (value, field_indices.get(name)) {
+                feature.set_field(index, value)?;
+            }
+        }
+
+        /*
+        for (name, value) in &record.fields {
             if let Some(value) = value {
                 if out_layer.defn().field_index(name).is_ok() {
                     feature.set_field(name, value)?;
@@ -141,7 +157,6 @@ fn main() -> Result<()> {
             }
         }
 
-        /*
         for (name, value) in &record.fields {
             if let Some(v) = value {
                 feature.set_field(name, v)?;
