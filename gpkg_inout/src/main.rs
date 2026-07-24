@@ -18,6 +18,8 @@ struct FeatureRecord {
     fields: Vec<(String, Option<FieldValue>)>,
 }
 
+
+#[derive(Default)]
 pub struct LoadFeaturesOptions<'a> {
     pub layer_name: Option<&'a str>,
     pub bbox: Option<(f64, f64, f64, f64)>,
@@ -55,7 +57,9 @@ pub fn load_features(path: &str, options: LoadFeaturesOptions<'_>) -> Result<Vec
     let mut out = Vec::new();
 
     for feature in layer.features() {
-        let ogr_geom = feature.geometry().expect("feature has no geometry").clone();
+        let ogr_geom = feature
+            .geometry()
+            .ok_or_else(|| anyhow!("feature has no geometry"))?;
 
         let geo_geom = geo_types::Geometry::<f64>::try_from(ogr_geom)
             .expect("could not convert OGR geometry to geo_types");
