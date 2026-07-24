@@ -1,7 +1,7 @@
 use gdal::errors::Result;
 use gdal::vector::{Feature, FieldValue, Geometry, LayerAccess, LayerOptions};
 use gdal::{Dataset, DriverManager};
-use geo::Translate;
+use geo::{Buffer, Translate};
 use std::any::Any;
 use std::convert::TryFrom;
 
@@ -54,6 +54,7 @@ fn main() -> Result<()> {
         println!("{:?}", f.fields);
         //println!("{:?}", f.geometry);
         print_type_of(&f.geometry);
+        let buff = f.geometry.buffer(50);
     }
 
     Ok(())
