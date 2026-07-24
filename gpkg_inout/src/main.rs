@@ -121,7 +121,6 @@ fn main() -> Result<()> {
         out_layer.create_defn_fields(&[(name.as_str(), *field_type)])?;
     }
 
-    /*
     for record in records {
         let mut feature = Feature::new(out_layer.defn())?;
 
@@ -139,7 +138,6 @@ fn main() -> Result<()> {
     }
 
     println!("Wrote translated features to {}", output_path);
-    */
 
     Ok(())
 }
