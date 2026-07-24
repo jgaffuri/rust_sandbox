@@ -81,7 +81,7 @@ fn main() -> Result<()> {
     println!("Done");
 
     for mut f in records {
-        println!("{:?}", f.fields.get("NUTS_ID"));
+        println!("{:?}", f.fields.get("NUTS_ID").and_then(|value| value.as_ref()).unwrap());
         //println!("{:?}", f.geometry);
         print_type_of(&f.geometry);
         f.geometry = geo_types::Geometry::MultiPolygon(f.geometry.buffer(50.0));
