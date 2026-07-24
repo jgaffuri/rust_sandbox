@@ -13,8 +13,9 @@ fn print_type_of<T>(_: &T) {
 
 #[derive(Debug)]
 struct FeatureRecord {
-    fields: Vec<(String, Option<FieldValue>)>,
     geometry: geo_types::Geometry<f64>,
+    //TODO make it a hashmap instead
+    fields: Vec<(String, Option<FieldValue>)>,
 }
 
 pub struct LoadFeaturesOptions<'a> {
