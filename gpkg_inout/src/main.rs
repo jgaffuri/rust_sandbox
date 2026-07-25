@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use anyhow::{Result, anyhow};
 use gdal::vector::{Feature, FieldValue, LayerAccess, LayerOptions};
 use gdal::{Dataset, DriverManager};
-use geo::{Rect}; //TODO remove that
 use geos::Geom;
 
 fn print_type_of<T>(_: &T) {
@@ -23,7 +22,7 @@ pub struct FeatureRecord {
 #[derive(Default)]
 pub struct LoadFeaturesOptions<'a> {
     pub layer_name: Option<&'a str>,
-    pub bbox: Option<Rect<f64>>,
+    pub bbox: Option<&'a [f64; 4]>,
     pub attribute_filter: Option<&'a str>,
 }
 
@@ -35,8 +34,8 @@ pub fn load_features(path: &str, options: LoadFeaturesOptions<'_>) -> Result<Vec
         None => dataset.layer(0)?,
     };
 
-    if let Some(rect) = options.bbox {
-        layer.set_spatial_filter_rect(rect.min().x, rect.min().y, rect.max().x, rect.max().y);
+    if let Some(bbox) = options.bbox {
+        layer.set_spatial_filter_rect(bbox[0], bbox[1], bbox[2], bbox[3]);
     }
 
     if let Some(filter) = options.attribute_filter {
