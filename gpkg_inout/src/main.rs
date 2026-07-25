@@ -4,9 +4,10 @@ use gdal::vector::{Feature, FieldValue, LayerAccess, LayerOptions};
 use gdal::{Dataset, DriverManager};
 use geos::Geom;
 
+/*
 fn print_type_of<T>(_: &T) {
     println!("{}", std::any::type_name::<T>());
-}
+}*/
 
 /*
 pub struct FeatureCollection {
@@ -17,6 +18,7 @@ pub struct FeatureCollection {
 pub struct FeatureRecord {
     pub geometry: geos::Geometry,
     pub fields: HashMap<String, Option<FieldValue>>,
+    //pub fields2: HashMap<String, Option<FieldValue>>,
 }
 
 #[derive(Default)]
@@ -81,11 +83,11 @@ fn main() -> Result<()> {
             "{:?}",
             f.fields
                 .get("NUTS_ID")
-                .and_then(|value| value.as_ref())
-                .unwrap()
+                //.and_then(|value| value.as_ref())
+                //.unwrap()
         );
         //println!("{:?}", f.geometry);
-        print_type_of(&f.geometry);
+        //print_type_of(&f.geometry);
         //f.geometry = geo_types::Geometry::MultiPolygon(f.geometry.buffer(50.0));
         f.geometry = f.geometry.buffer(5000.0, 2)?;
     }
