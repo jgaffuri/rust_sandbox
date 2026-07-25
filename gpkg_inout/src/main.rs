@@ -1,13 +1,10 @@
 //use anyhow::Result;
 use anyhow::{Result, anyhow};
-//use gdal::errors::Result;
-use gdal::vector::{Feature, FieldValue, Geometry, LayerAccess, LayerOptions, ToGdal};
+use gdal::vector::{Feature, FieldValue, LayerAccess, LayerOptions, ToGdal};
 use gdal::{Dataset, DriverManager};
-use geo::{Buffer, Rect, Translate};
-use std::any::Any;
+use geo::{Buffer, Rect};
 use std::collections::HashMap;
 use std::convert::TryFrom;
-use std::ops::Deref;
 
 fn print_type_of<T>(_: &T) {
     println!("{}", std::any::type_name::<T>());
@@ -115,7 +112,7 @@ fn main() -> Result<()> {
     let driver = DriverManager::get_driver_by_name("GPKG")?;
     let mut out_dataset = driver.create_vector_only(output_path)?;
 
-    let mut out_layer = out_dataset.create_layer(LayerOptions {
+    let out_layer = out_dataset.create_layer(LayerOptions {
         name: output_layer_name,
         srs: srs.as_ref(),
         ty: geom_field_type,
