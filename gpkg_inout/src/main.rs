@@ -1,8 +1,8 @@
-use std::collections::HashMap;
 use anyhow::{Result, anyhow};
 use gdal::vector::{Feature, FieldValue, LayerAccess, LayerOptions};
 use gdal::{Dataset, DriverManager};
 use geos::Geom;
+use std::collections::HashMap;
 
 /*
 fn print_type_of<T>(_: &T) {
@@ -18,7 +18,7 @@ pub struct FeatureCollection {
 pub struct FeatureRecord {
     pub geometry: geos::Geometry,
     pub fields: HashMap<String, Option<FieldValue>>,
-    //pub fields2: HashMap<String, Option<FieldValue>>,
+    pub fields2: HashMap<String, FieldValue>,
 }
 
 #[derive(Default)]
@@ -54,9 +54,18 @@ pub fn load_features(path: &str, options: LoadFeaturesOptions<'_>) -> Result<Vec
             let g: Vec<u8> = g.wkb()?;
             let g = geos::Geometry::new_from_wkb(&g)?;
 
+            let mut fields: HashMap<String, FieldValue> = HashMap::new();
+            for fff in feature.fields() {
+                let key = fff.0;
+                let value = fff.1.unwrap();
+                fields.insert(key, value);
+                //println!("{}    {:?}", key, value)
+            }
+
             Ok(FeatureRecord {
                 geometry: g,
                 fields: feature.fields().collect(),
+                fields2: fields,
             })
         })
         .collect()
@@ -78,14 +87,10 @@ fn main() -> Result<()> {
 
     println!("Done");
 
+
+
     for f in &mut records {
-        println!(
-            "{:?}",
-            f.fields
-                .get("NUTS_ID")
-                //.and_then(|value| value.as_ref())
-                //.unwrap()
-        );
+        println!("{:?}", f.fields2.get("NUTS_ID").unwrap());
         //println!("{:?}", f.geometry);
         //print_type_of(&f.geometry);
         //f.geometry = geo_types::Geometry::MultiPolygon(f.geometry.buffer(50.0));
