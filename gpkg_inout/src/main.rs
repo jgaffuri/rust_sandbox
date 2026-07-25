@@ -71,65 +71,23 @@ pub fn load_features(path: &str, options: LoadFeaturesOptions<'_>) -> Result<Vec
         .collect()
 }
 
-fn main() -> Result<()> {
-    let input_path = "/home/juju/geodata/gisco/NUTS_RG_01M_2021_3035.gpkg";
+pub fn save_features(fs: &Vec<FeatureRecord>, path: &str, md: &GPKGMetadata) -> Result<()> {
 
-    let mut records = load_features(
-        input_path,
-        LoadFeaturesOptions {
-            layer_name: None,
-            bbox: None,
-            attribute_filter: Some("LEVL_CODE = 0"),
-        },
-    )?;
-
-    println!("Loaded {} features from {}", records.len(), input_path);
-
-    println!("Done");
-
-
-
-    for f in &mut records {
-        println!("{:?}", f.fields2.get("NUTS_ID").unwrap());
-        //println!("{:?}", f.geometry);
-        //print_type_of(&f.geometry);
-        //f.geometry = geo_types::Geometry::MultiPolygon(f.geometry.buffer(50.0));
-        f.geometry = f.geometry.buffer(5000.0, 2)?;
-    }
-
-    println!("Modified {} features", records.len());
-
-    let output_path = "/home/juju/Bureau/rust_out.gpkg";
     let output_layer_name = "lay";
 
     //
-    let dataset = Dataset::open(input_path)?;
-    let layer = dataset.layer(0)?;
-    let srs = layer.spatial_ref();
-    let geom_field_type = layer
-        .defn()
-        .geom_fields()
-        .next()
-        .map(|f| f.field_type())
-        .unwrap_or(gdal_sys::OGRwkbGeometryType::wkbUnknown);
-    let field_defs: Vec<(String, gdal::vector::OGRFieldType::Type)> = layer
-        .defn()
-        .fields()
-        .map(|f| (f.name(), f.field_type()))
-        .collect();
-
     let driver = DriverManager::get_driver_by_name("GPKG")?;
-    let mut out_dataset = driver.create_vector_only(output_path)?;
+    let mut out_dataset = driver.create_vector_only(path)?;
 
     let out_layer = out_dataset.create_layer(LayerOptions {
         name: output_layer_name,
-        srs: srs.as_ref(),
-        ty: geom_field_type,
+        srs: md.srs.as_ref(),
+        ty: md.geom_field_type,
         ..Default::default()
     })?;
 
     // Recreate the attribute schema on the output layer.
-    for (name, field_type) in &field_defs {
+    for (name, field_type) in &md.field_defs {
         out_layer.create_defn_fields(&[(name.as_str(), *field_type)])?;
     }
 
@@ -140,7 +98,7 @@ fn main() -> Result<()> {
         .map(|(i, field)| (field.name(), i))
         .collect();
 
-    for record in records {
+    for record in fs {
         let mut feature = Feature::new(out_layer.defn())?;
 
         //let ggg = record.geometry.to_gdal()?;
@@ -175,7 +133,71 @@ fn main() -> Result<()> {
         feature.create(&out_layer)?;
     }
 
+    Ok(())
+}
+
+
+pub struct GPKGMetadata {
+    pub srs: Option<gdal::spatial_ref::SpatialRef>,
+    pub geom_field_type: u32,
+    pub field_defs: Vec<(String, gdal::vector::OGRFieldType::Type)>,
+}
+
+fn get_metadata(path: &str) -> GPKGMetadata {
+    let dataset: Dataset = Dataset::open(path).unwrap();
+    let layer: gdal::vector::Layer<'_> = dataset.layer(0).unwrap();
+    let geom_field_type = layer
+        .defn()
+        .geom_fields()
+        .next()
+        .map(|f| f.field_type())
+        .unwrap_or(gdal_sys::OGRwkbGeometryType::wkbUnknown);
+    let field_defs: Vec<(String, gdal::vector::OGRFieldType::Type)> = layer
+        .defn()
+        .fields()
+        .map(|f| (f.name(), f.field_type()))
+        .collect();
+    GPKGMetadata {
+        srs: layer.spatial_ref(),
+        geom_field_type: geom_field_type,
+        field_defs: field_defs,
+    }
+}
+
+fn main() -> Result<()> {
+    let input_path = "/home/juju/geodata/gisco/NUTS_RG_01M_2021_3035.gpkg";
+
+    let mut records = load_features(
+        input_path,
+        LoadFeaturesOptions {
+            layer_name: None,
+            bbox: None,
+            attribute_filter: Some("LEVL_CODE = 0"),
+        },
+    )?;
+
+    println!("Loaded {} features from {}", records.len(), input_path);
+
+    for f in &mut records {
+        if let Some(FieldValue::StringValue(s)) = f.fields2.get("NUTS_ID") {
+            println!("NUTS_ID: {}", s);
+        } else {
+            println!("NUTS_ID: <missing>");
+        }
+        //println!("{:?}", f.geometry);
+        //print_type_of(&f.geometry);
+        //f.geometry = geo_types::Geometry::MultiPolygon(f.geometry.buffer(50.0));
+        f.geometry = f.geometry.buffer(5000.0, 2)?;
+    }
+
+    println!("Modified {} features", records.len());
+
+    let output_path = "/home/juju/Bureau/rust_out.gpkg";
+    let md = get_metadata(input_path);
+    save_features(&records, output_path, &md)?;
+
     println!("Wrote translated features to {}", output_path);
 
     Ok(())
 }
+
