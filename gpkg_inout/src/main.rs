@@ -1,11 +1,10 @@
-//use anyhow::Result;
+use std::collections::HashMap;
+use std::convert::TryFrom;
 use anyhow::{Result, anyhow};
 use gdal::vector::{Feature, FieldValue, LayerAccess, LayerOptions, ToGdal};
 use gdal::{Dataset, DriverManager};
-use geo::{Buffer, Rect};
+use geo::{Rect}; //TODO remove that
 use geos::Geom;
-use std::collections::HashMap;
-use std::convert::TryFrom;
 
 fn print_type_of<T>(_: &T) {
     println!("{}", std::any::type_name::<T>());
@@ -142,9 +141,12 @@ fn main() -> Result<()> {
     for record in records {
         let mut feature = Feature::new(out_layer.defn())?;
 
-        let ggg = record.geometry.to_gdal()?;
+        //let ggg = record.geometry.to_gdal()?;
         //let ogr_geom = gdal::vector::Geometry::try_from(record.geometry)
         //    .expect("could not convert geo_types geometry back to OGR");
+
+        let wkb = record.geometry2.to_wkb()?;
+        let ggg = gdal::vector::Geometry::from_wkb(&wkb)?;
         feature.set_geometry(ggg)?;
 
         for (name, value) in &record.fields {
