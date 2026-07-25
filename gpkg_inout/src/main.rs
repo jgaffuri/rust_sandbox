@@ -92,7 +92,7 @@ fn main() -> Result<()> {
         //println!("{:?}", f.geometry);
         print_type_of(&f.geometry);
         //f.geometry = geo_types::Geometry::MultiPolygon(f.geometry.buffer(50.0));
-        f.geometry2 = f.geometry2.buffer(50.0, 10)?;
+        f.geometry2 = f.geometry2.buffer(5000.0, 2)?;
     }
 
     println!("Modified {} features", records.len());
