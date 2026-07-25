@@ -3,6 +3,7 @@ use anyhow::{Result, anyhow};
 use gdal::vector::{Feature, FieldValue, LayerAccess, LayerOptions, ToGdal};
 use gdal::{Dataset, DriverManager};
 use geo::{Buffer, Rect};
+use geos::Geom;
 use std::collections::HashMap;
 use std::convert::TryFrom;
 
@@ -18,6 +19,7 @@ pub struct FeatureCollection {
 
 pub struct FeatureRecord {
     pub geometry: geo_types::Geometry<f64>,
+    pub geometry2: geos::Geometry,
     pub fields: HashMap<String, Option<FieldValue>>,
 }
 
@@ -51,8 +53,13 @@ pub fn load_features(path: &str, options: LoadFeaturesOptions<'_>) -> Result<Vec
                 .geometry()
                 .ok_or_else(|| anyhow!("feature has no geometry"))?;
 
+            let geos_geom: Vec<u8> = ogr_geom.wkb()?;
+            let geos_geom = geos::Geometry::new_from_wkb(&geos_geom)?;
+            //println!("{:#?}", geos_geom);
+
             Ok(FeatureRecord {
                 geometry: geo_types::Geometry::try_from(ogr_geom)?,
+                geometry2: geos_geom,
                 fields: feature.fields().collect(),
             })
         })
@@ -85,7 +92,8 @@ fn main() -> Result<()> {
         );
         //println!("{:?}", f.geometry);
         print_type_of(&f.geometry);
-        f.geometry = geo_types::Geometry::MultiPolygon(f.geometry.buffer(50.0));
+        //f.geometry = geo_types::Geometry::MultiPolygon(f.geometry.buffer(50.0));
+        f.geometry2 = f.geometry2.buffer(50.0, 10)?;
     }
 
     println!("Modified {} features", records.len());
