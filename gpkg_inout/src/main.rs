@@ -1,7 +1,6 @@
 use std::collections::HashMap;
-use std::convert::TryFrom;
 use anyhow::{Result, anyhow};
-use gdal::vector::{Feature, FieldValue, LayerAccess, LayerOptions, ToGdal};
+use gdal::vector::{Feature, FieldValue, LayerAccess, LayerOptions};
 use gdal::{Dataset, DriverManager};
 use geo::{Rect}; //TODO remove that
 use geos::Geom;
@@ -17,8 +16,7 @@ pub struct FeatureCollection {
 }*/
 
 pub struct FeatureRecord {
-    pub geometry: geo_types::Geometry<f64>,
-    pub geometry2: geos::Geometry,
+    pub geometry: geos::Geometry,
     pub fields: HashMap<String, Option<FieldValue>>,
 }
 
@@ -48,17 +46,15 @@ pub fn load_features(path: &str, options: LoadFeaturesOptions<'_>) -> Result<Vec
     layer
         .features()
         .map(|feature| {
-            let ogr_geom = feature
+            let g = feature
                 .geometry()
                 .ok_or_else(|| anyhow!("feature has no geometry"))?;
 
-            let geos_geom: Vec<u8> = ogr_geom.wkb()?;
-            let geos_geom = geos::Geometry::new_from_wkb(&geos_geom)?;
-            //println!("{:#?}", geos_geom);
+            let g: Vec<u8> = g.wkb()?;
+            let g = geos::Geometry::new_from_wkb(&g)?;
 
             Ok(FeatureRecord {
-                geometry: geo_types::Geometry::try_from(ogr_geom)?,
-                geometry2: geos_geom,
+                geometry: g,
                 fields: feature.fields().collect(),
             })
         })
@@ -92,7 +88,7 @@ fn main() -> Result<()> {
         //println!("{:?}", f.geometry);
         print_type_of(&f.geometry);
         //f.geometry = geo_types::Geometry::MultiPolygon(f.geometry.buffer(50.0));
-        f.geometry2 = f.geometry2.buffer(5000.0, 2)?;
+        f.geometry = f.geometry.buffer(5000.0, 2)?;
     }
 
     println!("Modified {} features", records.len());
@@ -145,7 +141,7 @@ fn main() -> Result<()> {
         //let ogr_geom = gdal::vector::Geometry::try_from(record.geometry)
         //    .expect("could not convert geo_types geometry back to OGR");
 
-        let wkb = record.geometry2.to_wkb()?;
+        let wkb = record.geometry.to_wkb()?;
         let ggg = gdal::vector::Geometry::from_wkb(&wkb)?;
         feature.set_geometry(ggg)?;
 
