@@ -8,7 +8,6 @@ use std::collections::HashMap;
 /*
 TODO
 make schema from feature collection
-CRS from EPSG
 generic save GPKG function from feature collection
 extract load/save functions to separate module
 */
