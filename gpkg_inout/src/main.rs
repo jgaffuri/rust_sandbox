@@ -1,9 +1,12 @@
 use anyhow::{Result, anyhow};
 use gdal::spatial_ref::SpatialRef;
-use gdal::vector::{Feature as GDALFeature, FieldValue, LayerAccess, LayerOptions};
+use gdal::vector::{Feature as GDALFeature, FieldValue, OGRFieldType, LayerAccess, LayerOptions};
 use gdal::{Dataset, DriverManager};
 use geos::Geom;
+use geos::GeometryTypes;
 use std::collections::HashMap;
+use gdal_sys::OGRwkbGeometryType;
+
 
 /*
 TODO
@@ -140,6 +143,56 @@ fn get_metadata(path: &str) -> GPKGMetadata {
         field_defs: field_defs,
     }
 }
+
+
+
+fn feature_to_gpkg_metadata(feature: &Feature) -> GPKGMetadata {
+    let geom_field_type = ogr_geometry_type_of(&feature.geometry);
+
+    let field_defs = feature
+        .fields
+        .iter()
+        .map(|(name, value)| (name.clone(), ogr_field_type_of(value)))
+        .collect();
+
+    GPKGMetadata {
+        geom_field_type,
+        field_defs,
+    }
+}
+
+fn ogr_geometry_type_of(geom: &geos::Geometry) -> OGRwkbGeometryType::Type {
+    match geom
+        .geometry_type()
+        .expect("could not get geos geometry type")
+    {
+        GeometryTypes::Point => OGRwkbGeometryType::wkbPoint,
+        GeometryTypes::LineString | GeometryTypes::LinearRing => {
+            OGRwkbGeometryType::wkbLineString
+        }
+        GeometryTypes::Polygon => OGRwkbGeometryType::wkbPolygon,
+        GeometryTypes::MultiPoint => OGRwkbGeometryType::wkbMultiPoint,
+        GeometryTypes::MultiLineString => OGRwkbGeometryType::wkbMultiLineString,
+        GeometryTypes::MultiPolygon => OGRwkbGeometryType::wkbMultiPolygon,
+        GeometryTypes::GeometryCollection => OGRwkbGeometryType::wkbGeometryCollection,
+    }
+}
+
+fn ogr_field_type_of(value: &FieldValue) -> OGRFieldType::Type {
+    match value {
+        FieldValue::IntegerValue(_) => OGRFieldType::OFTInteger,
+        FieldValue::IntegerListValue(_) => OGRFieldType::OFTIntegerList,
+        FieldValue::Integer64Value(_) => OGRFieldType::OFTInteger64,
+        FieldValue::Integer64ListValue(_) => OGRFieldType::OFTInteger64List,
+        FieldValue::RealValue(_) => OGRFieldType::OFTReal,
+        FieldValue::RealListValue(_) => OGRFieldType::OFTRealList,
+        FieldValue::StringValue(_) => OGRFieldType::OFTString,
+        FieldValue::StringListValue(_) => OGRFieldType::OFTStringList,
+        FieldValue::DateValue(_) => OGRFieldType::OFTDate,
+        FieldValue::DateTimeValue(_) => OGRFieldType::OFTDateTime,
+    }
+}
+
 
 fn main() -> Result<()> {
     let input_path = "/home/juju/geodata/gisco/NUTS_RG_01M_2021_3035.gpkg";
