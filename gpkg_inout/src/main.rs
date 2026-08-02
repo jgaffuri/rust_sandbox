@@ -109,22 +109,6 @@ pub fn save_features(fs: &Vec<Feature>, path: &str, md: &GPKGMetadata, epsg: u32
                 feature.set_field(index, value)?;
             }
         }
-
-        /*
-        for (name, value) in &record.fields {
-            if let Some(value) = value {
-                if out_layer.defn().field_index(name).is_ok() {
-                    feature.set_field(name, value)?;
-                }
-            }
-        }
-
-        for (name, value) in &record.fields {
-            if let Some(v) = value {
-                feature.set_field(name, v)?;
-            }
-        }*/
-
         feature.create(&out_layer)?;
     }
 
