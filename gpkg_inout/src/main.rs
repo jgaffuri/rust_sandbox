@@ -1,5 +1,5 @@
 use anyhow::{Result, anyhow};
-use gdal::vector::{Feature, FieldValue, LayerAccess, LayerOptions};
+use gdal::vector::{Feature as GDALFeature, FieldValue, LayerAccess, LayerOptions};
 use gdal::{Dataset, DriverManager};
 use geos::Geom;
 use std::collections::HashMap;
@@ -23,7 +23,7 @@ pub struct FeatureCollection {
     pub records: Vec<FeatureRecord>,
 }*/
 
-pub struct FeatureRecord {
+pub struct Feature {
     pub geometry: geos::Geometry,
     pub fields: HashMap<String, Option<FieldValue>>,
     pub fields2: HashMap<String, FieldValue>,
@@ -36,7 +36,7 @@ pub struct LoadFeaturesOptions<'a> {
     pub attribute_filter: Option<&'a str>,
 }
 
-pub fn load_features(path: &str, options: LoadFeaturesOptions<'_>) -> Result<Vec<FeatureRecord>> {
+pub fn load_features(path: &str, options: LoadFeaturesOptions<'_>) -> Result<Vec<Feature>> {
     let dataset = Dataset::open(path)?;
 
     let mut layer = match options.layer_name {
@@ -70,7 +70,7 @@ pub fn load_features(path: &str, options: LoadFeaturesOptions<'_>) -> Result<Vec
                 //println!("{}    {:?}", key, value)
             }
 
-            Ok(FeatureRecord {
+            Ok(Feature {
                 geometry: g,
                 fields: feature.fields().collect(),
                 fields2: fields,
@@ -79,7 +79,7 @@ pub fn load_features(path: &str, options: LoadFeaturesOptions<'_>) -> Result<Vec
         .collect()
 }
 
-pub fn save_features(fs: &Vec<FeatureRecord>, path: &str, md: &GPKGMetadata) -> Result<()> {
+pub fn save_features(fs: &Vec<Feature>, path: &str, md: &GPKGMetadata) -> Result<()> {
 
     let output_layer_name = "lay";
 
@@ -107,7 +107,7 @@ pub fn save_features(fs: &Vec<FeatureRecord>, path: &str, md: &GPKGMetadata) -> 
         .collect();
 
     for record in fs {
-        let mut feature = Feature::new(out_layer.defn())?;
+        let mut feature = GDALFeature::new(out_layer.defn())?;
 
         //let ggg = record.geometry.to_gdal()?;
         //let ogr_geom = gdal::vector::Geometry::try_from(record.geometry)
