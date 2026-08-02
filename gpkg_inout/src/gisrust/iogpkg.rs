@@ -1,13 +1,12 @@
+use crate::gisrust::base::Feature;
 use anyhow::{Result, anyhow};
 use gdal::spatial_ref::SpatialRef;
-use gdal::vector::{Feature as GDALFeature, FieldValue, OGRFieldType, LayerAccess, LayerOptions};
+use gdal::vector::{Feature as GDALFeature, FieldValue, LayerAccess, LayerOptions, OGRFieldType};
 use gdal::{Dataset, DriverManager};
+use gdal_sys::OGRwkbGeometryType;
 use geos::Geom;
 use geos::GeometryTypes;
 use std::collections::HashMap;
-use gdal_sys::OGRwkbGeometryType;
-use crate::gisrust::base::Feature;
-
 
 pub struct LoadFeaturesOptions<'a> {
     pub layer_name: Option<&'a str>,
@@ -61,10 +60,12 @@ pub fn save_features(fs: &Vec<Feature>, path: &str, epsg: u32) -> Result<()> {
     if fs.is_empty() {
         return Err(anyhow!("No features to save"));
     }
+    let f0 = &fs[0];
 
     let output_layer_name = "lay";
     let srs_projected = SpatialRef::from_epsg(epsg)?;
-    let md = feature_to_gpkg_metadata(&fs[0]);
+    let schema = feature_to_gpkg_schema(&f0);
+    let gtype = ogr_geometry_type_of(&f0.geometry);
 
     //
     let driver = DriverManager::get_driver_by_name("GPKG")?;
@@ -73,12 +74,12 @@ pub fn save_features(fs: &Vec<Feature>, path: &str, epsg: u32) -> Result<()> {
     let out_layer = out_dataset.create_layer(LayerOptions {
         name: output_layer_name,
         srs: Some(&srs_projected),
-        ty: md.geom_field_type,
+        ty: gtype,
         ..Default::default()
     })?;
 
     // Recreate the attribute schema on the output layer.
-    for (name, field_type) in &md.field_defs {
+    for (name, field_type) in &schema {
         out_layer.create_defn_fields(&[(name.as_str(), *field_type)])?;
     }
 
@@ -111,14 +112,14 @@ pub fn save_features(fs: &Vec<Feature>, path: &str, epsg: u32) -> Result<()> {
     Ok(())
 }
 
-pub struct GPKGMetadata {
+/*pub struct GPKGMetadata {
     //pub srs: Option<gdal::spatial_ref::SpatialRef>,
     pub geom_field_type: u32,
     pub field_defs: Vec<(String, gdal::vector::OGRFieldType::Type)>,
 }
+*/
 
-
-pub fn get_metadata(path: &str) -> GPKGMetadata {
+/*pub fn get_metadata(path: &str) -> GPKGMetadata {
     let dataset: Dataset = Dataset::open(path).unwrap();
     let layer: gdal::vector::Layer<'_> = dataset.layer(0).unwrap();
     let geom_field_type = layer
@@ -137,22 +138,16 @@ pub fn get_metadata(path: &str) -> GPKGMetadata {
         field_defs: field_defs,
     }
 }
+*/
 
-
-
-fn feature_to_gpkg_metadata(feature: &Feature) -> GPKGMetadata {
-    let geom_field_type = ogr_geometry_type_of(&feature.geometry);
-
+fn feature_to_gpkg_schema(feature: &Feature) -> Vec<(String, gdal::vector::OGRFieldType::Type)> {
     let field_defs = feature
         .fields
         .iter()
         .map(|(name, value)| (name.clone(), ogr_field_type_of(value)))
         .collect();
 
-    GPKGMetadata {
-        geom_field_type,
-        field_defs,
-    }
+    field_defs
 }
 
 fn ogr_geometry_type_of(geom: &geos::Geometry) -> OGRwkbGeometryType::Type {
@@ -161,9 +156,7 @@ fn ogr_geometry_type_of(geom: &geos::Geometry) -> OGRwkbGeometryType::Type {
         .expect("could not get geos geometry type")
     {
         GeometryTypes::Point => OGRwkbGeometryType::wkbPoint,
-        GeometryTypes::LineString | GeometryTypes::LinearRing => {
-            OGRwkbGeometryType::wkbLineString
-        }
+        GeometryTypes::LineString | GeometryTypes::LinearRing => OGRwkbGeometryType::wkbLineString,
         GeometryTypes::Polygon => OGRwkbGeometryType::wkbPolygon,
         GeometryTypes::MultiPoint => OGRwkbGeometryType::wkbMultiPoint,
         GeometryTypes::MultiLineString => OGRwkbGeometryType::wkbMultiLineString,
@@ -186,7 +179,3 @@ fn ogr_field_type_of(value: &FieldValue) -> OGRFieldType::Type {
         FieldValue::DateTimeValue(_) => OGRFieldType::OFTDateTime,
     }
 }
-
-
-
-
