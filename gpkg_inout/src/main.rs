@@ -14,7 +14,7 @@ extract load/save functions to separate module
 
 pub struct Feature {
     pub geometry: geos::Geometry,
-    pub fields: HashMap<String, FieldValue>,
+    pub fields: HashMap<String, gdal::vector::FieldValue>,
 }
 
 #[derive(Default)]
