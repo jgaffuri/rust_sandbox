@@ -56,16 +56,18 @@ pub fn load_features(path: &str, options: LoadFeaturesOptions<'_>) -> Result<Vec
         .collect()
 }
 
+
 pub fn save_features(fs: &Vec<Feature>, path: &str, epsg: u32) -> Result<()> {
     if fs.is_empty() {
         return Err(anyhow!("No features to save"));
     }
     let f0 = &fs[0];
 
+    //TODO parameter
     let output_layer_name = "lay";
+    //TODO parameter
+    let geom_type = ogr_geometry_type_of(&f0.geometry);
     let srs_projected = SpatialRef::from_epsg(epsg)?;
-    let schema = feature_to_gpkg_schema(&f0);
-    let gtype = ogr_geometry_type_of(&f0.geometry);
 
     //
     let driver = DriverManager::get_driver_by_name("GPKG")?;
@@ -74,11 +76,12 @@ pub fn save_features(fs: &Vec<Feature>, path: &str, epsg: u32) -> Result<()> {
     let out_layer = out_dataset.create_layer(LayerOptions {
         name: output_layer_name,
         srs: Some(&srs_projected),
-        ty: gtype,
+        ty: geom_type,
         ..Default::default()
     })?;
 
     // Recreate the attribute schema on the output layer.
+    let schema = feature_to_gpkg_schema(&f0);
     for (name, field_type) in &schema {
         out_layer.create_defn_fields(&[(name.as_str(), *field_type)])?;
     }
