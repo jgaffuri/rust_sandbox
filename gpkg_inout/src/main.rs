@@ -13,7 +13,6 @@ use std::time::Instant;
 /*
 TODO
 extract load/save functions to separate module
-test performance - print time
 test performance with compile optimised
 */
 
