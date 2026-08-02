@@ -5,6 +5,14 @@ use geos::Geom;
 use std::collections::HashMap;
 
 /*
+TODO
+make schema from feature collection
+CRS from EPSG
+generic save GPKG function from feature collection
+extract load/save functions to separate module
+*/
+
+/*
 fn print_type_of<T>(_: &T) {
     println!("{}", std::any::type_name::<T>());
 }*/
