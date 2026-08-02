@@ -6,8 +6,10 @@ use geos::Geom;
 use geos::GeometryTypes;
 use std::collections::HashMap;
 use gdal_sys::OGRwkbGeometryType;
-
 use std::time::Instant;
+use crate::base::Feature;
+
+pub mod base;
 
 
 /*
@@ -16,10 +18,6 @@ extract load/save functions to separate module
 test performance with compile optimised
 */
 
-pub struct Feature {
-    pub geometry: geos::Geometry,
-    pub fields: HashMap<String, gdal::vector::FieldValue>,
-}
 
 #[derive(Default)]
 pub struct LoadFeaturesOptions<'a> {
