@@ -7,6 +7,8 @@ use geos::GeometryTypes;
 use std::collections::HashMap;
 use gdal_sys::OGRwkbGeometryType;
 
+use std::time::Instant;
+
 
 /*
 TODO
@@ -204,6 +206,9 @@ fn ogr_field_type_of(value: &FieldValue) -> OGRFieldType::Type {
 fn main() -> Result<()> {
     let input_path = "/home/juju/geodata/gisco/NUTS_RG_01M_2021_3035.gpkg";
 
+    let start = Instant::now();
+    println!("elapsed: {:?}", start.elapsed());
+
     let mut records = load_features(
         input_path,
         LoadFeaturesOptions {
@@ -214,12 +219,13 @@ fn main() -> Result<()> {
     )?;
 
     println!("Loaded {} features from {}", records.len(), input_path);
+    println!("elapsed: {:?}", start.elapsed());
 
     for f in &mut records {
         if let Some(FieldValue::StringValue(s)) = f.fields.get("NUTS_ID") {
-            println!("NUTS_ID: {}", s);
+            //println!("NUTS_ID: {}", s);
         } else {
-            println!("NUTS_ID: <missing>");
+            //println!("NUTS_ID: <missing>");
         }
         //println!("{:?}", f.geometry);
         //print_type_of(&f.geometry);
@@ -228,11 +234,13 @@ fn main() -> Result<()> {
     }
 
     println!("Modified {} features", records.len());
+    println!("elapsed: {:?}", start.elapsed());
 
     let output_path = "/home/juju/Bureau/rust_out.gpkg";
     save_features(&records, output_path, 3035)?;
 
     println!("Wrote translated features to {}", output_path);
+    println!("elapsed: {:?}", start.elapsed());
 
     Ok(())
 }
