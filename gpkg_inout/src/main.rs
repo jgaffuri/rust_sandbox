@@ -1,7 +1,7 @@
 use anyhow::{Result, anyhow};
+use gdal::spatial_ref::SpatialRef;
 use gdal::vector::{Feature as GDALFeature, FieldValue, LayerAccess, LayerOptions};
 use gdal::{Dataset, DriverManager};
-use gdal::spatial_ref::SpatialRef;
 use geos::Geom;
 use std::collections::HashMap;
 
@@ -14,8 +14,7 @@ extract load/save functions to separate module
 
 pub struct Feature {
     pub geometry: geos::Geometry,
-    pub fields: HashMap<String, Option<FieldValue>>,
-    pub fields2: HashMap<String, FieldValue>,
+    pub fields: HashMap<String, FieldValue>,
 }
 
 #[derive(Default)]
@@ -61,16 +60,13 @@ pub fn load_features(path: &str, options: LoadFeaturesOptions<'_>) -> Result<Vec
 
             Ok(Feature {
                 geometry: g,
-                fields: feature.fields().collect(),
-                fields2: fields,
+                fields,
             })
         })
         .collect()
 }
 
-
 pub fn save_features(fs: &Vec<Feature>, path: &str, md: &GPKGMetadata, epsg: u32) -> Result<()> {
-
     let output_layer_name = "lay";
     let srs_projected = SpatialRef::from_epsg(epsg)?;
 
@@ -109,7 +105,7 @@ pub fn save_features(fs: &Vec<Feature>, path: &str, md: &GPKGMetadata, epsg: u32
         feature.set_geometry(ggg)?;
 
         for (name, value) in &record.fields {
-            if let (Some(value), Some(&index)) = (value, field_indices.get(name)) {
+            if let Some(&index) = field_indices.get(name) {
                 feature.set_field(index, value)?;
             }
         }
@@ -134,7 +130,6 @@ pub fn save_features(fs: &Vec<Feature>, path: &str, md: &GPKGMetadata, epsg: u32
 
     Ok(())
 }
-
 
 pub struct GPKGMetadata {
     //pub srs: Option<gdal::spatial_ref::SpatialRef>,
@@ -177,7 +172,7 @@ fn main() -> Result<()> {
     println!("Loaded {} features from {}", records.len(), input_path);
 
     for f in &mut records {
-        if let Some(FieldValue::StringValue(s)) = f.fields2.get("NUTS_ID") {
+        if let Some(FieldValue::StringValue(s)) = f.fields.get("NUTS_ID") {
             println!("NUTS_ID: {}", s);
         } else {
             println!("NUTS_ID: <missing>");
@@ -198,4 +193,3 @@ fn main() -> Result<()> {
 
     Ok(())
 }
-
