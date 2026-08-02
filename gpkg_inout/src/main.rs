@@ -1,6 +1,7 @@
 use anyhow::{Result, anyhow};
 use gdal::vector::{Feature as GDALFeature, FieldValue, LayerAccess, LayerOptions};
 use gdal::{Dataset, DriverManager};
+use gdal::spatial_ref::SpatialRef;
 use geos::Geom;
 use std::collections::HashMap;
 
@@ -11,17 +12,6 @@ CRS from EPSG
 generic save GPKG function from feature collection
 extract load/save functions to separate module
 */
-
-/*
-fn print_type_of<T>(_: &T) {
-    println!("{}", std::any::type_name::<T>());
-}*/
-
-/*
-pub struct FeatureCollection {
-    pub fields: Vec<FieldDef>,
-    pub records: Vec<FeatureRecord>,
-}*/
 
 pub struct Feature {
     pub geometry: geos::Geometry,
@@ -79,9 +69,11 @@ pub fn load_features(path: &str, options: LoadFeaturesOptions<'_>) -> Result<Vec
         .collect()
 }
 
-pub fn save_features(fs: &Vec<Feature>, path: &str, md: &GPKGMetadata) -> Result<()> {
+
+pub fn save_features(fs: &Vec<Feature>, path: &str, md: &GPKGMetadata, epsg: u32) -> Result<()> {
 
     let output_layer_name = "lay";
+    let srs_projected = SpatialRef::from_epsg(epsg)?;
 
     //
     let driver = DriverManager::get_driver_by_name("GPKG")?;
@@ -89,7 +81,7 @@ pub fn save_features(fs: &Vec<Feature>, path: &str, md: &GPKGMetadata) -> Result
 
     let out_layer = out_dataset.create_layer(LayerOptions {
         name: output_layer_name,
-        srs: md.srs.as_ref(),
+        srs: Some(&srs_projected),
         ty: md.geom_field_type,
         ..Default::default()
     })?;
@@ -146,7 +138,7 @@ pub fn save_features(fs: &Vec<Feature>, path: &str, md: &GPKGMetadata) -> Result
 
 
 pub struct GPKGMetadata {
-    pub srs: Option<gdal::spatial_ref::SpatialRef>,
+    //pub srs: Option<gdal::spatial_ref::SpatialRef>,
     pub geom_field_type: u32,
     pub field_defs: Vec<(String, gdal::vector::OGRFieldType::Type)>,
 }
@@ -166,7 +158,6 @@ fn get_metadata(path: &str) -> GPKGMetadata {
         .map(|f| (f.name(), f.field_type()))
         .collect();
     GPKGMetadata {
-        srs: layer.spatial_ref(),
         geom_field_type: geom_field_type,
         field_defs: field_defs,
     }
@@ -202,7 +193,7 @@ fn main() -> Result<()> {
 
     let output_path = "/home/juju/Bureau/rust_out.gpkg";
     let md = get_metadata(input_path);
-    save_features(&records, output_path, &md)?;
+    save_features(&records, output_path, &md, 3035)?;
 
     println!("Wrote translated features to {}", output_path);
 
