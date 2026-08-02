@@ -58,9 +58,12 @@ pub fn load_features(path: &str, options: LoadFeaturesOptions<'_>) -> Result<Vec
 }
 
 pub fn save_features(fs: &Vec<Feature>, path: &str, epsg: u32) -> Result<()> {
+    if fs.is_empty() {
+        return Err(anyhow!("No features to save"));
+    }
+
     let output_layer_name = "lay";
     let srs_projected = SpatialRef::from_epsg(epsg)?;
-    //TODO: check if fs is empty and return error if so
     let md = feature_to_gpkg_metadata(&fs[0]);
 
     //
@@ -94,8 +97,8 @@ pub fn save_features(fs: &Vec<Feature>, path: &str, epsg: u32) -> Result<()> {
         //    .expect("could not convert geo_types geometry back to OGR");
 
         let wkb = record.geometry.to_wkb()?;
-        let ggg = gdal::vector::Geometry::from_wkb(&wkb)?;
-        feature.set_geometry(ggg)?;
+        let g = gdal::vector::Geometry::from_wkb(&wkb)?;
+        feature.set_geometry(g)?;
 
         for (name, value) in &record.fields {
             if let Some(&index) = field_indices.get(name) {

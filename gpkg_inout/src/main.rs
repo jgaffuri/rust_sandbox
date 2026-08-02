@@ -11,6 +11,7 @@ use crate::gisrust::iogpkg::{load_features, save_features, LoadFeaturesOptions};
 /*
 TODO
 test performance with compile optimised
+gpkg save: force geom type
 */
 
 
