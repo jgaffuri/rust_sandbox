@@ -1,5 +1,5 @@
 use anyhow::{Result};
-use gdal::vector::{FieldValue};
+//use gdal::vector::{FieldValue};
 use geos::Geom;
 use std::time::Instant;
 
@@ -33,11 +33,11 @@ fn main() -> Result<()> {
     println!("elapsed: {:?}", start.elapsed());
 
     for f in &mut records {
-        if let Some(FieldValue::StringValue(s)) = f.fields.get("NUTS_ID") {
-            //println!("NUTS_ID: {}", s);
+        /*if let Some(FieldValue::StringValue(s)) = f.fields.get("NUTS_ID") {
+            println!("NUTS_ID: {}", s);
         } else {
-            //println!("NUTS_ID: <missing>");
-        }
+            println!("NUTS_ID: <missing>");
+        }*/
         //println!("{:?}", f.geometry);
         //print_type_of(&f.geometry);
         //f.geometry = geo_types::Geometry::MultiPolygon(f.geometry.buffer(50.0));
