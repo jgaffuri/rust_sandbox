@@ -12,3 +12,11 @@ anyhow = "1.0.104"
 #gdal = { version = "0.19.0", features = ["gdal-src"] }
 #geo = "0.33.1"
 #geo-types = "0.7.19"
+
+
+[profile.release]
+opt-level = 3          # max optimization (3 is actually the default for release, but explicit is good)
+lto = "fat"             # link-time optimization across the whole dependency graph — biggest single win
+codegen-units = 1        # trades compile time for better optimization (no parallel codegen units to hurt inlining)
+panic = "abort"          # removes unwinding machinery; smaller/faster, but no catch_unwind and backtraces on panic are cruder
+strip = true             # strips symbols, smaller binary (doesn't affect speed, just size)
