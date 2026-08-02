@@ -10,9 +10,9 @@ use gdal_sys::OGRwkbGeometryType;
 
 /*
 TODO
-make schema from feature collection
-generic save GPKG function from feature collection
 extract load/save functions to separate module
+test performance - print time
+test performance with compile optimised
 */
 
 pub struct Feature {
@@ -69,9 +69,11 @@ pub fn load_features(path: &str, options: LoadFeaturesOptions<'_>) -> Result<Vec
         .collect()
 }
 
-pub fn save_features(fs: &Vec<Feature>, path: &str, md: &GPKGMetadata, epsg: u32) -> Result<()> {
+pub fn save_features(fs: &Vec<Feature>, path: &str, epsg: u32) -> Result<()> {
     let output_layer_name = "lay";
     let srs_projected = SpatialRef::from_epsg(epsg)?;
+    //TODO: check if fs is empty and return error if so
+    let md = feature_to_gpkg_metadata(&fs[0]);
 
     //
     let driver = DriverManager::get_driver_by_name("GPKG")?;
@@ -194,6 +196,11 @@ fn ogr_field_type_of(value: &FieldValue) -> OGRFieldType::Type {
 }
 
 
+
+
+
+
+
 fn main() -> Result<()> {
     let input_path = "/home/juju/geodata/gisco/NUTS_RG_01M_2021_3035.gpkg";
 
@@ -223,8 +230,7 @@ fn main() -> Result<()> {
     println!("Modified {} features", records.len());
 
     let output_path = "/home/juju/Bureau/rust_out.gpkg";
-    let md = get_metadata(input_path);
-    save_features(&records, output_path, &md, 3035)?;
+    save_features(&records, output_path, 3035)?;
 
     println!("Wrote translated features to {}", output_path);
 
