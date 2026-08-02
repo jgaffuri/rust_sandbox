@@ -12,6 +12,7 @@ use crate::gisrust::iogpkg::{load_features, save_features, LoadFeaturesOptions};
 TODO
 gpkg save: force geom type + layer name
 translate some geometrical algorithms
+schematic generalisation
 */
 
 
