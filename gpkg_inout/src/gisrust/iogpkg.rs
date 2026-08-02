@@ -6,7 +6,7 @@ use geos::Geom;
 use geos::GeometryTypes;
 use std::collections::HashMap;
 use gdal_sys::OGRwkbGeometryType;
-use crate::base::Feature;
+use crate::gisrust::base::Feature;
 
 
 pub struct LoadFeaturesOptions<'a> {
@@ -114,7 +114,8 @@ pub struct GPKGMetadata {
     pub field_defs: Vec<(String, gdal::vector::OGRFieldType::Type)>,
 }
 
-fn get_metadata(path: &str) -> GPKGMetadata {
+
+pub fn get_metadata(path: &str) -> GPKGMetadata {
     let dataset: Dataset = Dataset::open(path).unwrap();
     let layer: gdal::vector::Layer<'_> = dataset.layer(0).unwrap();
     let geom_field_type = layer
