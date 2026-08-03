@@ -10,7 +10,6 @@ use crate::gisrust::iogpkg::{load_features, save_features, LoadFeaturesOptions};
 
 /*
 TODO
-ragen
 circularity and squarness ranking
 translate some geometrical algorithms
 schematic generalisation
