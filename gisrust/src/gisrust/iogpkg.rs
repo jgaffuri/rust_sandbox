@@ -50,7 +50,7 @@ pub fn load_features(path: &str, options: LoadFeaturesOptions<'_>) -> Result<Vec
 
             Ok(Feature {
                 geometry: g,
-                fields,
+                attributes: fields,
             })
         })
         .collect()
@@ -100,7 +100,7 @@ pub fn save_features(fs: &Vec<Feature>, path: &str, epsg: Option<u32>, layer_nam
         let g = gdal::vector::Geometry::from_wkb(&wkb)?;
         feature.set_geometry(g)?;
 
-        for (name, value) in &record.fields {
+        for (name, value) in &record.attributes {
             if let Some(&index) = field_indices.get(name) {
                 feature.set_field(index, value)?;
             }
@@ -141,7 +141,7 @@ pub fn save_features(fs: &Vec<Feature>, path: &str, epsg: Option<u32>, layer_nam
 
 fn feature_to_gpkg_schema(feature: &Feature) -> Vec<(String, gdal::vector::OGRFieldType::Type)> {
     let field_defs = feature
-        .fields
+        .attributes
         .iter()
         .map(|(name, value)| (name.clone(), ogr_field_type_of(value)))
         .collect();
