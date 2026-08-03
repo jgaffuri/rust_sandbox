@@ -3,9 +3,9 @@ use anyhow::{Result};
 use geos::Geom;
 use std::time::Instant;
 
-pub mod gisrust;
+pub mod ragen;
 
-use crate::gisrust::iogpkg::{load_features, save_features, LoadFeaturesOptions};
+use crate::ragen::iogpkg::{load_features, save_features, LoadFeaturesOptions};
 
 
 /*
@@ -45,7 +45,7 @@ fn main() -> Result<()> {
         //f.geometry = geo_types::Geometry::MultiPolygon(f.geometry.buffer(50.0));
 
         let g = f.geometry.buffer(5000.0, 2)?;
-        let g = gisrust::geom_utils::to_multi(g)?;
+        let g = ragen::geom_utils::to_multi(g)?;
         f.geometry = g;
     }
 
