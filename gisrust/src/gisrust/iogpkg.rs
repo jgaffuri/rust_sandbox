@@ -56,25 +56,21 @@ pub fn load_features(path: &str, options: LoadFeaturesOptions<'_>) -> Result<Vec
         .collect()
 }
 
-
-pub fn save_features(fs: &Vec<Feature>, path: &str, epsg: u32) -> Result<()> {
+pub fn save_features(fs: &Vec<Feature>, path: &str, epsg: Option<u32>, layer_name: Option<&str>) -> Result<()> {
     if fs.is_empty() {
         return Err(anyhow!("No features to save"));
     }
     let f0 = &fs[0];
 
-    //TODO parameter
-    let output_layer_name = "lay";
-    //TODO parameter
     let geom_type = ogr_geometry_type_of(&f0.geometry);
-    let srs_projected = SpatialRef::from_epsg(epsg)?;
+    let srs_projected = SpatialRef::from_epsg(epsg.unwrap_or(4326))?;
 
     //
     let driver = DriverManager::get_driver_by_name("GPKG")?;
     let mut out_dataset = driver.create_vector_only(path)?;
 
     let out_layer = out_dataset.create_layer(LayerOptions {
-        name: output_layer_name,
+        name: layer_name.unwrap_or("layer"),
         srs: Some(&srs_projected),
         ty: geom_type,
         ..Default::default()

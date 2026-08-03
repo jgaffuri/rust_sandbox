@@ -10,7 +10,7 @@ use crate::gisrust::iogpkg::{load_features, save_features, LoadFeaturesOptions};
 
 /*
 TODO
-gpkg save: force geom type + layer name
+geom to multi
 translate some geometrical algorithms
 schematic generalisation
 circularity and squarness ranking
@@ -51,7 +51,7 @@ fn main() -> Result<()> {
     println!("elapsed: {:?}", start.elapsed());
 
     let output_path = "/home/juju/Bureau/rust_out.gpkg";
-    save_features(&records, output_path, 3035)?;
+    save_features(&records, output_path, Some(3035), None)?;
 
     println!("Wrote translated features to {}", output_path);
     println!("elapsed: {:?}", start.elapsed());
