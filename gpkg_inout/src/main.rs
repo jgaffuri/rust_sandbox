@@ -13,6 +13,7 @@ TODO
 gpkg save: force geom type + layer name
 translate some geometrical algorithms
 schematic generalisation
+circularity and squarness ranking
 */
 
 
