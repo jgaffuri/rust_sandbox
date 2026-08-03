@@ -44,7 +44,10 @@ fn main() -> Result<()> {
         //println!("{:?}", f.geometry);
         //print_type_of(&f.geometry);
         //f.geometry = geo_types::Geometry::MultiPolygon(f.geometry.buffer(50.0));
-        f.geometry = f.geometry.buffer(5000.0, 2)?;
+
+        let g = f.geometry.buffer(5000.0, 2)?;
+        let g = gisrust::geom_utils::to_multi(g)?;
+        f.geometry = g;
     }
 
     println!("Modified {} features", records.len());
