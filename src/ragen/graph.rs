@@ -1,4 +1,5 @@
-use geos::{Geom, Geometry, GeometryTypes};
+use geos::{Point, LineString, Polygon};
+use crate::ragen::base::Feature;
 
 pub struct Graph<'a> {
     pub nodes: Vec<Node<'a>>,
@@ -21,4 +22,8 @@ pub struct Edge<'a> {
 pub struct Domain<'a> {
     pub geometry: Polygon,
     pub edges: Vec<&'a Edge<'a>>,
+}
+
+trait GraphBuilder {
+    fn build_graph(&self, features: Vec<Feature>) -> Graph;
 }
