@@ -2,6 +2,10 @@ use anyhow::Result;
 //use gdal::vector::{FieldValue};
 use geos::Geom;
 use std::time::Instant;
+use wkt::TryFromWkt;
+
+use geo::{Geometry as GeoGeometry, MinimumRotatedRect};
+//use geo::algorithm::wkt::ToWkt;
 
 pub mod ragen;
 
@@ -51,16 +55,16 @@ fn main() -> Result<()> {
         //print geometry type
         println!("Geometry type: {:?}", f.geometry.geometry_type());
         //print geometry number of points
-        println!("Geometry number of points: {:?}", f.geometry.get_num_points()?);
+        println!("Geometry number of points: {:?}", f.geometry.get_num_coordinates()?);
         //print geometry first point
-        if let Ok(first_point) = f.geometry.get_point_n(0) {
-            match first_point.to_wkt() {
-                Ok(wkt) => println!("Geometry first point WKT: {}", wkt),
-                Err(e) => println!("Geometry first point (no WKT): {}", e),
-            }
-        } else {
-            println!("Geometry has no points");
-        }
+        let coord_seq = f.geometry.get_geometry_n(0)?.get_exterior_ring()?.get_coord_seq()?;
+        println!("Geometry first point: {:?}", coord_seq.get_x(0).and_then(|x| coord_seq.get_y(0).map(|y| (x, y))));
+
+        //let geo_geom: GeoGeometry<f64> = (&f.geometry).try_into()?;
+        //let g = g.minimum_rotated_rectangle()?;
+        //f.geometry = g;
+        let gg = geos_to_geo(&f.geometry)?;
+        let gg = gg.minimum_rotated_rect();
     }
 
     println!("Modified {} features", records.len());
@@ -74,3 +78,20 @@ fn main() -> Result<()> {
 
     Ok(())
 }
+
+
+
+fn geos_to_geo(geom: &geos::Geometry) -> Result<geo_types::Geometry<f64>> {
+    let wkt_str = geom.to_wkt()?;
+    let geo_geom = geo_types::Geometry::<f64>::try_from_wkt_str(&wkt_str).map_err(|e| anyhow::anyhow!("{}", e))?;
+    Ok(geo_geom)
+}
+
+/*
+fn geo_to_geos(geom: &geo_types::Geometry<f64>) -> Result<geos::Geometry, Box<dyn std::error::Error>> {
+    //use geo::algorithm::to_wkt::ToWkt; // for geo_types -> WKT string
+    let wkt_str = geom.to_wkt().to_string();
+    let geos_geom = geos::Geometry::new_from_wkt(&wkt_str)?;
+    Ok(geos_geom)
+}
+*/
