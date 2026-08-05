@@ -1,11 +1,11 @@
-use anyhow::{Result};
+use anyhow::Result;
 //use gdal::vector::{FieldValue};
 use geos::Geom;
 use std::time::Instant;
 
 pub mod ragen;
 
-use crate::ragen::iogpkg::{load_features, save_features, LoadFeaturesOptions};
+use crate::ragen::io::{load_features, save_features, LoadFeaturesOptions};
 
 
 /*
@@ -47,6 +47,20 @@ fn main() -> Result<()> {
         let g = f.geometry.buffer(5000.0, 2)?;
         let g = ragen::geom_utils::to_multi(g)?;
         f.geometry = g;
+
+        //print geometry type
+        println!("Geometry type: {:?}", f.geometry.geometry_type());
+        //print geometry number of points
+        println!("Geometry number of points: {:?}", f.geometry.get_num_points()?);
+        //print geometry first point
+        if let Ok(first_point) = f.geometry.get_point_n(0) {
+            match first_point.to_wkt() {
+                Ok(wkt) => println!("Geometry first point WKT: {}", wkt),
+                Err(e) => println!("Geometry first point (no WKT): {}", e),
+            }
+        } else {
+            println!("Geometry has no points");
+        }
     }
 
     println!("Modified {} features", records.len());
