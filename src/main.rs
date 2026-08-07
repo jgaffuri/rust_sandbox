@@ -2,7 +2,7 @@ use anyhow::Result;
 //use gdal::vector::{FieldValue};
 use geos::Geom;
 use std::time::Instant;
-use wkt::TryFromWkt;
+use wkt::{ToWkt, TryFromWkt};
 
 use geo::{Geometry as GeoGeometry, MinimumRotatedRect};
 //use geo::algorithm::wkt::ToWkt;
@@ -65,7 +65,11 @@ fn main() -> Result<()> {
         //f.geometry = g;
         let gg = geos_to_geo(&f.geometry)?;
         let gg = gg.minimum_rotated_rect();
-        println!("{:?}", gg);
+        if let Some(gg) = gg {
+            let gg = geo_to_geos(&geo_types::Geometry::Polygon(gg));
+            f.geometry = gg?;
+            //println!("{:?}", gg);
+        }
     }
 
     println!("Modified {} features", records.len());
@@ -88,11 +92,8 @@ fn geos_to_geo(geom: &geos::Geometry) -> Result<geo_types::Geometry<f64>> {
     Ok(geo_geom)
 }
 
-/*
-fn geo_to_geos(geom: &geo_types::Geometry<f64>) -> Result<geos::Geometry, Box<dyn std::error::Error>> {
-    //use geo::algorithm::to_wkt::ToWkt; // for geo_types -> WKT string
-    let wkt_str = geom.to_wkt().to_string();
-    let geos_geom = geos::Geometry::new_from_wkt(&wkt_str)?;
+fn geo_to_geos(geom: &geo_types::Geometry<f64>) -> Result<geos::Geometry> {
+    let geos_geom = geos::Geometry::new_from_wkt(&geom.to_wkt().to_string())?;
     Ok(geos_geom)
 }
-*/
+
