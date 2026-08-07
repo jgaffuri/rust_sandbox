@@ -53,18 +53,19 @@ fn main() -> Result<()> {
         f.geometry = g;
 
         //print geometry type
-        println!("Geometry type: {:?}", f.geometry.geometry_type());
+        //println!("Geometry type: {:?}", f.geometry.geometry_type());
         //print geometry number of points
-        println!("Geometry number of points: {:?}", f.geometry.get_num_coordinates()?);
+        //println!("Geometry number of points: {:?}", f.geometry.get_num_coordinates()?);
         //print geometry first point
-        let coord_seq = f.geometry.get_geometry_n(0)?.get_exterior_ring()?.get_coord_seq()?;
-        println!("Geometry first point: {:?}", coord_seq.get_x(0).and_then(|x| coord_seq.get_y(0).map(|y| (x, y))));
+        //let coord_seq = f.geometry.get_geometry_n(0)?.get_exterior_ring()?.get_coord_seq()?;
+        //println!("Geometry first point: {:?}", coord_seq.get_x(0).and_then(|x| coord_seq.get_y(0).map(|y| (x, y))));
 
         //let geo_geom: GeoGeometry<f64> = (&f.geometry).try_into()?;
         //let g = g.minimum_rotated_rectangle()?;
         //f.geometry = g;
         let gg = geos_to_geo(&f.geometry)?;
         let gg = gg.minimum_rotated_rect();
+        println!("{:?}", gg);
     }
 
     println!("Modified {} features", records.len());
