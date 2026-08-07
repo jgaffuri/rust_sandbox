@@ -4,8 +4,7 @@ use geos::Geom;
 use std::time::Instant;
 use wkt::{ToWkt, TryFromWkt};
 
-use geo::{Geometry as GeoGeometry, MinimumRotatedRect};
-//use geo::algorithm::wkt::ToWkt;
+use geo::{MinimumRotatedRect};
 
 pub mod ragen;
 
