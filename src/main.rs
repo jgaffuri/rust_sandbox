@@ -2,13 +2,13 @@ use anyhow::Result;
 //use gdal::vector::{FieldValue};
 use geos::Geom;
 use std::time::Instant;
-use wkt::{ToWkt, TryFromWkt};
 
 use geo::{MinimumRotatedRect};
 
 pub mod ragen;
 
 use crate::ragen::io::{load_features, save_features, LoadFeaturesOptions};
+use crate::ragen::geom_utils::{geo_to_geos, geos_to_geo};
 
 
 /*
@@ -81,18 +81,5 @@ fn main() -> Result<()> {
     println!("elapsed: {:?}", start.elapsed());
 
     Ok(())
-}
-
-
-
-fn geos_to_geo(geom: &geos::Geometry) -> Result<geo_types::Geometry<f64>> {
-    let wkt_str = geom.to_wkt()?;
-    let geo_geom = geo_types::Geometry::<f64>::try_from_wkt_str(&wkt_str).map_err(|e| anyhow::anyhow!("{}", e))?;
-    Ok(geo_geom)
-}
-
-fn geo_to_geos(geom: &geo_types::Geometry<f64>) -> Result<geos::Geometry> {
-    let geos_geom = geos::Geometry::new_from_wkt(&geom.to_wkt().to_string())?;
-    Ok(geos_geom)
 }
 
