@@ -3,7 +3,7 @@ use gdal::vector::{FieldValue};
 use geos::Geom;
 use std::time::Instant;
 
-use geo::{Haversine, Euclidean, Distance, Point};
+use geo::{Euclidean, Distance, Point};
 use geo::{MinimumRotatedRect};
 
 pub mod ragen;
@@ -69,8 +69,8 @@ fn main() -> Result<()> {
         //let geo_geom: GeoGeometry<f64> = (&f.geometry).try_into()?;
         //let g = g.minimum_rotated_rectangle()?;
         //f.geometry = g;
-        let gg = geos_to_geo(&f.geometry)?;
-        let gg = gg.minimum_rotated_rect();
+        let g_geo = geos_to_geo(&f.geometry)?;
+        let gg = g_geo.minimum_rotated_rect();
         if let Some(gg) = gg {
             let gg = geo_to_geos(&geo_types::Geometry::Polygon(gg));
             let mmbra = gg?.area()?;
@@ -81,6 +81,8 @@ fn main() -> Result<()> {
             //f.geometry = gg?;
             //println!("{:?}", gg);
         }
+        let elongation = elongation_measure(&g_geo)?;
+        f.attributes.insert("elongation".to_string(), FieldValue::RealValue(elongation));
     }
 
     println!("Modified {} features", records.len());
