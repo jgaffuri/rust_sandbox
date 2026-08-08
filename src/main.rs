@@ -69,7 +69,12 @@ fn main() -> Result<()> {
         let gg = gg.minimum_rotated_rect();
         if let Some(gg) = gg {
             let gg = geo_to_geos(&geo_types::Geometry::Polygon(gg));
-            f.geometry = gg?;
+            let mmbra = gg?.area()?;
+
+            let rectangularity = f.geometry.area()? / mmbra;
+            f.attributes.insert("rectangularity".to_string(), FieldValue::IntegerValue((rectangularity*100.0).round() as i32));
+
+            //f.geometry = gg?;
             //println!("{:?}", gg);
         }
     }
