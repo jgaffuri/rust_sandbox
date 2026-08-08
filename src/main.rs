@@ -20,7 +20,8 @@ schematic generalisation
 
 
 fn main() -> Result<()> {
-    let input_path = "/home/juju/geodata/gisco/NUTS_RG_01M_2021_3035.gpkg";
+    //let input_path = "/home/juju/geodata/gisco/NUTS_RG_01M_2021_3035.gpkg";
+    let input_path = "/home/juju/geodata/eurogeographics/EBM/EBM_LAU_2026_2.gpkg";
 
     let start = Instant::now();
     println!("elapsed: {:?}", start.elapsed());
