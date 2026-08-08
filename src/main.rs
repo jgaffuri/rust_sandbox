@@ -30,7 +30,7 @@ fn main() -> Result<()> {
         LoadFeaturesOptions {
             layer_name: None,
             bbox: None,
-            attribute_filter: Some("LEVL_CODE = 0"),
+            attribute_filter: None, //Some("LEVL_CODE = 0"),
         },
     )?;
 
@@ -47,9 +47,9 @@ fn main() -> Result<()> {
         //print_type_of(&f.geometry);
         //f.geometry = geo_types::Geometry::MultiPolygon(f.geometry.buffer(50.0));
 
-        //let g = f.geometry.buffer(5000.0, 2)?;
-        //let g = ragen::geom_utils::to_multi(g)?;
-        //f.geometry = g;
+        let g = Clone::clone(&f.geometry); //f.geometry.buffer(5000.0, 2)?;
+        let g = ragen::geom_utils::to_multi(g)?;
+        f.geometry = g;
 
         let circularity = 4.0 * std::f64::consts::PI * f.geometry.area()? / (f.geometry.length()? * f.geometry.length()?);
         f.attributes.insert("circularity".to_string(), FieldValue::IntegerValue((circularity*100.0).round() as i32));
