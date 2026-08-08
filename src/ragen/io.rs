@@ -43,9 +43,19 @@ pub fn load_features(path: &str, options: LoadFeaturesOptions<'_>) -> Result<Vec
             let mut fields: HashMap<String, FieldValue> = HashMap::new();
             for fff in feature.fields() {
                 let key = fff.0;
-                let value = fff.1.unwrap();
-                fields.insert(key, value);
-                //println!("{}    {:?}", key, value)
+                /*let value = match fff.1 {
+                    Some(FieldValue::StringValue(s)) => FieldValue::StringValue(s.clone()),
+                    Some(FieldValue::IntegerValue(i)) => FieldValue::IntegerValue(*i),
+                    Some(FieldValue::RealValue(r)) => FieldValue::RealValue(*r),
+                    Some(FieldValue::DateValue(d)) => FieldValue::DateValue(d.clone()),
+                    Some(FieldValue::DateTimeValue(dt)) => FieldValue::DateTimeValue(dt.clone()),
+                    None => FieldValue::StringValue("<missing>".to_string()),
+                };*/
+                if let Some(vvvvvv) = fff.1 {
+                        fields.insert(key, vvvvvv);
+                } else {
+                    println!("Field {} is missing", key);
+                }
             }
 
             Ok(Feature {
