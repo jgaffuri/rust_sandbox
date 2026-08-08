@@ -8,7 +8,7 @@ use geo::{MinimumRotatedRect};
 pub mod ragen;
 
 use crate::ragen::io::{load_features, save_features, LoadFeaturesOptions};
-use crate::ragen::geom_utils::{geo_to_geos, geos_to_geo};
+use crate::ragen::geom_utils::{geo_to_geos, geos_to_geo, elongation_measure};
 
 
 /*
