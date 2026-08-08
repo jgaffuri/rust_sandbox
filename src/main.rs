@@ -3,6 +3,7 @@ use gdal::vector::{FieldValue};
 use geos::Geom;
 use std::time::Instant;
 
+use geo::algorithm::Distance;
 use geo::{MinimumRotatedRect};
 
 pub mod ragen;
@@ -94,3 +95,30 @@ fn main() -> Result<()> {
     Ok(())
 }
 
+/*
+use geo::EuclideanLength;
+
+let mut segments = linestring.lines();
+
+let first_len = segments.next().map(|l| l.euclidean_length());
+let second_len = segments.next().map(|l| l.euclidean_length());
+
+println!("{:?}, {:?}", first_len, second_len);
+*/
+
+fn elongation_measure(geometry: &geo_types::Geometry<f64>) -> Result<f64> {
+    let min_rot_rect = geometry.minimum_rotated_rect();
+    if let Some(min_rot_rect) = min_rot_rect {
+        let coords = min_rot_rect.exterior().coords().collect::<Vec<_>>();
+        if coords.len() >= 4 {
+            //let width = coords[0].distance(&coords[1]);
+            //let height = coords[1].distance(&coords[2]);
+            //let width = geo_types::Point::from(coords[0]).euclidean_distance(&geo_types::Point::from(coords[1]));
+            //let height = geo_types::Point::from(coords[1]).euclidean_distance(&geo_types::Point::from(coords[2]));
+            if width > 0.0 && height > 0.0 {
+                return Ok(width.min(height) / width.max(height));
+            }
+        }
+    }
+    Ok(0.0)
+}
