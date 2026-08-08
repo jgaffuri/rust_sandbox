@@ -1,5 +1,5 @@
 use anyhow::Result;
-//use gdal::vector::{FieldValue};
+use gdal::vector::{FieldValue};
 use geos::Geom;
 use std::time::Instant;
 
@@ -50,6 +50,9 @@ fn main() -> Result<()> {
         let g = f.geometry.buffer(5000.0, 2)?;
         let g = ragen::geom_utils::to_multi(g)?;
         f.geometry = g;
+
+        let circularity = 4.0 * std::f64::consts::PI * f.geometry.area()? / (f.geometry.length()? * f.geometry.length()?);
+        f.attributes.insert("circularity".to_string(), FieldValue::IntegerValue((circularity*100.0).round() as i32));
 
         //print geometry type
         //println!("Geometry type: {:?}", f.geometry.geometry_type());
