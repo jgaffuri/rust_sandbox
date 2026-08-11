@@ -14,6 +14,7 @@ use crate::ragen::geom_utils::{geo_to_geos, geos_to_geo, elongation_measure};
 /*
 TODO
 improve geo-geos conversion: choice. test performance ?
+
 graph model
 translate some geometrical algorithms ?
 schematic generalisation
