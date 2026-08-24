@@ -7,3 +7,9 @@ pub struct Agent {
 pub struct Constraint {
     pub statisfaction: i8,
 }
+
+/*
+pub trait compute_statisfaction {
+    fn compute_statisfaction(&mut self);
+}
+ */
