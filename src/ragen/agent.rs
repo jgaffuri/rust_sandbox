@@ -1,6 +1,6 @@
 pub struct Agent {
     statisfaction: i8,
-    constraints: [Constraint; 1],
+    constraints: Vec<Constraint>,
 }
 
 //#[derive(Debug)]
@@ -18,7 +18,7 @@ impl Agent {
     pub fn new() -> Self {
         Agent {
             statisfaction: 0,
-            constraints: [Constraint { statisfaction: 0 }],
+            constraints: Vec::new(),
         }
     }
 
@@ -27,11 +27,11 @@ impl Agent {
     }
 
     pub fn add_constraint(&mut self, constraint: Constraint) {
-        self.constraints[0] = constraint;
+        self.constraints.push(constraint);
     }
 
     pub fn clear_constraints(&mut self) {
-        self.constraints = [Constraint { statisfaction: 0 }];
+        self.constraints.clear();
     }
 
     pub fn compute_statisfaction(&mut self) {
