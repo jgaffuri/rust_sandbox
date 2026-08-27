@@ -1,4 +1,7 @@
+use crate::ragen::base::Feature;
+
 pub struct Agent {
+    feature: Feature,
     statisfaction: i8,
     constraints: Vec<Constraint>,
     components: Vec<Agent>,
@@ -18,6 +21,7 @@ pub trait compute_statisfaction {
 impl Agent {
     pub fn new() -> Self {
         Agent {
+            feature: Feature::new(),
             statisfaction: 0,
             constraints: Vec::new(),
             components: Vec::new(),

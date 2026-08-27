@@ -7,3 +7,12 @@ pub struct Feature {
     pub geometry: Geometry,
     pub attributes: HashMap<String, FieldValue>,
 }
+
+impl Feature {
+    pub fn new() -> Self {
+        Feature {
+            geometry: Geometry::create_empty(geos::GeometryTypes::GeometryCollection).unwrap(),
+            attributes: HashMap::new(),
+        }
+    }
+}
