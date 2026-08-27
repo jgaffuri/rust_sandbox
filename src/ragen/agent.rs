@@ -1,6 +1,7 @@
 pub struct Agent {
     statisfaction: i8,
     constraints: Vec<Constraint>,
+    components: Vec<Agent>,
 }
 
 //#[derive(Debug)]
@@ -19,7 +20,12 @@ impl Agent {
         Agent {
             statisfaction: 0,
             constraints: Vec::new(),
+            components: Vec::new(),
         }
+    }
+
+    pub fn components(&self) -> &Vec<Agent> {
+        &self.components
     }
 
     pub fn get_statisfaction(&self) -> i8 {
