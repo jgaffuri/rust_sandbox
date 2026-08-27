@@ -11,7 +11,7 @@ pub struct Feature {
 impl Feature {
     pub fn new() -> Self {
         Feature {
-            geometry: Geometry::create_empty(geos::GeometryTypes::GeometryCollection).unwrap(),
+            geometry: Geometry::create_empty_point().unwrap(),
             attributes: HashMap::new(),
         }
     }
