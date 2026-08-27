@@ -1,6 +1,6 @@
 pub struct Agent {
-    pub statisfaction: i8,
-    pub constraints: [Constraint; 1],
+    statisfaction: i8,
+    constraints: [Constraint; 1],
 }
 
 //#[derive(Debug)]
@@ -20,6 +20,18 @@ impl Agent {
             statisfaction: 0,
             constraints: [Constraint { statisfaction: 0 }],
         }
+    }
+
+    pub fn get_statisfaction(&self) -> i8 {
+        self.statisfaction
+    }
+
+    pub fn add_constraint(&mut self, constraint: Constraint) {
+        self.constraints[0] = constraint;
+    }
+
+    pub fn clear_constraints(&mut self) {
+        self.constraints = [Constraint { statisfaction: 0 }];
     }
 
     pub fn compute_statisfaction(&mut self) {
