@@ -6,6 +6,7 @@ pub struct Agent {
     constraints: Vec<Constraint>,
     components: Vec<Agent>,
     deleted: bool,
+    frozen: bool,
 }
 
 //#[derive(Debug)]
@@ -27,6 +28,7 @@ impl Agent {
             constraints: Vec::new(),
             components: Vec::new(),
             deleted: false,
+            frozen: false,
         }
     }
 
@@ -62,4 +64,19 @@ impl Agent {
         total_statisfaction = total_statisfaction / self.constraints.len() as i16;
         self.statisfaction = total_statisfaction as i8;
     }
+
+    pub fn freeze(&mut self) {
+        self.frozen = true;
+    }
+    pub fn unfreeze(&mut self) {
+        self.frozen = false;
+    }
+    pub fn is_frozen(&self) -> bool {
+        self.frozen
+    }
+
+    pub fn run(&mut self) {
+        //TODO
+    }
+
 }
