@@ -12,6 +12,8 @@ pub struct Agent {
 //#[derive(Debug)]
 pub struct Constraint {
     pub statisfaction: i8,
+    pub importance: i8,
+    pub priority: i8,
 }
 
 /*
@@ -58,11 +60,12 @@ impl Agent {
             return;
         }
         let mut total_statisfaction: i16 = 0;
+        let mut total_importance: i16 = 0;
         for constraint in &self.constraints {
-            total_statisfaction += constraint.statisfaction as i16;
+            total_statisfaction += (constraint.statisfaction as i16) * (constraint.importance as i16);
+            total_importance += constraint.importance as i16;
         }
-        total_statisfaction = total_statisfaction / self.constraints.len() as i16;
-        self.statisfaction = total_statisfaction as i8;
+        self.statisfaction = (total_statisfaction/total_importance) as i8;
     }
 
     pub fn freeze(&mut self) {
