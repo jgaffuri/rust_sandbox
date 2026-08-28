@@ -21,9 +21,9 @@ pub trait compute_statisfaction {
  */
 
 impl Agent {
-    pub fn new() -> Self {
+    pub fn new(feature:Feature) -> Self {
         Agent {
-            feature: Feature::new(),
+            feature: feature,
             statisfaction: 0,
             constraints: Vec::new(),
             components: Vec::new(),
