@@ -14,6 +14,7 @@ pub struct Constraint {
     pub statisfaction: i8,
     pub importance: i8,
     pub priority: i8,
+    pub hard_constraint: bool,
 }
 
 /*
