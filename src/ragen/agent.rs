@@ -32,6 +32,10 @@ impl Agent {
         &self.components
     }
 
+    pub fn feature(&self) -> &Feature {
+        &self.feature
+    }
+
     pub fn get_statisfaction(&self) -> i8 {
         self.statisfaction
     }
