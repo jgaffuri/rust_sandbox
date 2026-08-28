@@ -5,6 +5,7 @@ pub struct Agent {
     statisfaction: i8,
     constraints: Vec<Constraint>,
     components: Vec<Agent>,
+    deleted: bool,
 }
 
 //#[derive(Debug)]
@@ -25,6 +26,7 @@ impl Agent {
             statisfaction: 0,
             constraints: Vec::new(),
             components: Vec::new(),
+            deleted: false,
         }
     }
 
@@ -49,7 +51,7 @@ impl Agent {
     }
 
     pub fn compute_statisfaction(&mut self) {
-        if self.constraints.is_empty() {
+        if self.constraints.is_empty() || self.deleted {
             self.statisfaction = 10;
             return;
         }
