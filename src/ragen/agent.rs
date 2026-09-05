@@ -11,11 +11,13 @@ pub struct Agent {
 
 //#[derive(Debug)]
 pub struct Constraint {
+    pub agent: Agent,
     pub statisfaction: i8,
     pub importance: i8,
     pub priority: i8,
     pub hard_constraint: bool,
 }
+
 
 /*
 pub trait compute_statisfaction {
