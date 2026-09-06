@@ -18,6 +18,7 @@ pub struct Constraint {
     pub hard_constraint: bool,
 }
 
+//TODO check in jgiscotools
 pub struct AgenState {
     feature: Feature,
     statisfaction: i8,
