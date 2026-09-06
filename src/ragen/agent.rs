@@ -18,6 +18,11 @@ pub struct Constraint {
     pub hard_constraint: bool,
 }
 
+pub struct AgenState {
+    feature: Feature,
+    statisfaction: i8,
+}
+
 
 /*
 pub trait compute_statisfaction {
