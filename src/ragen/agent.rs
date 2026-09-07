@@ -53,7 +53,7 @@ impl Agent {
     }
 
 	pub fn is_satisfied(&self) -> bool {
-        10.0 - self.get_satisfaction() < SATISFACTION_RESOLUTION;
+        10.0 - self.get_satisfaction() < SATISFACTION_RESOLUTION
     }
 
 
