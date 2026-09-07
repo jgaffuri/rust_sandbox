@@ -105,13 +105,6 @@ impl Agent {
 }
 
 
-/*/TODO check in jgiscotools
-pub struct AgenState {
-    feature: Feature,
-    statisfaction: i8,
-}*/
-
-
 //#[derive(Debug)]
 pub struct Constraint {
     agent: Agent,
@@ -189,13 +182,18 @@ impl Constraint {
 
 
 pub trait Transformation {
+    fn get_agent(&self) -> &Agent;
+    fn apply(&self);
+    fn is_cancelable(self) -> bool;
+    fn to_string(self) -> String;
 }
 
-/*
-pub trait compute_statisfaction {
-    fn compute_statisfaction(&mut self);
+pub trait TransformationCancellable : Transformation {
+	fn is_cancelable(&self) { true; }
+	fn store_state(&self);	
+	fn cancel(&self);	
 }
- */
+
 
 
 pub struct SizeConstraint {
