@@ -78,7 +78,7 @@ impl Agent {
         self.frozen
     }
 
-    pub fn run(&mut self) {
+    pub fn activate(&mut self) {
         //TODO
     }
 
@@ -99,6 +99,21 @@ pub struct Constraint {
     importance: i8,
     priority: i8,
     hard: bool,
+}
+
+pub trait ConstraintTrait {
+    fn get_agent(&self) -> &Agent;
+
+    fn get_importance(&self) -> i8;
+    fn get_priority(&self) -> i8;
+    fn is_hard(&self) -> bool;
+    fn compute_current_value(&self) -> i8;
+
+    fn compute_satisfaction(&self) -> String;
+    fn get_satisfaction(&self) -> i8;
+    fn is_satisfied(&self, satisfactionResolution: f64) -> bool {
+        ((10 - self.get_satisfaction()) as f64) < satisfactionResolution
+    }
 }
 
 impl Constraint {
