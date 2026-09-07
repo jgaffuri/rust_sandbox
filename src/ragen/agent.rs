@@ -5,8 +5,8 @@ use crate::ragen::base::Feature;
 pub struct Agent {
     id: u32,
     feature: Feature,
-    statisfaction: i8,
-    constraints: Vec<Constraint>,
+    satisfaction: i8,
+    constraints: Vec<Box<dyn ConstraintTrait>>,
     components: Vec<Agent>,
     deleted: bool,
     frozen: bool,
@@ -22,7 +22,7 @@ impl Agent {
                 AGENT_ID
             },
             feature: feature,
-            statisfaction: 0,
+            satisfaction: 0,
             constraints: Vec::new(),
             components: Vec::new(),
             deleted: false,
@@ -34,6 +34,11 @@ impl Agent {
         self.id
     }
 
+    pub fn get_agent_type(&self) -> String {
+        //TODO
+        std::any::type_name::<Self>().to_string()
+    }
+
     pub fn components(&self) -> &Vec<Agent> {
         &self.components
     }
@@ -42,11 +47,11 @@ impl Agent {
         &self.feature
     }
 
-    pub fn get_statisfaction(&self) -> i8 {
-        self.statisfaction
+    pub fn get_satisfaction(&self) -> i8 {
+        self.satisfaction
     }
 
-    pub fn add_constraint(&mut self, constraint: Constraint) {
+    pub fn add_constraint(&mut self, constraint: Box<dyn ConstraintTrait>) {
         self.constraints.push(constraint);
     }
 
@@ -54,18 +59,33 @@ impl Agent {
         self.constraints.clear();
     }
 
-    pub fn compute_statisfaction(&mut self) {
+    pub fn compute_satisfaction(&mut self) {
         if self.constraints.is_empty() || self.deleted {
-            self.statisfaction = 10;
+            self.satisfaction = 10;
             return;
         }
-        let mut total_statisfaction: i16 = 0;
+        let mut total_satisfaction: i16 = 0;
         let mut total_importance: i16 = 0;
-        for constraint in &self.constraints {
-            total_statisfaction += (constraint.statisfaction as i16) * (constraint.importance as i16);
-            total_importance += constraint.importance as i16;
+        for c in &self.constraints {
+            c.compute_current_value();
+            c.compute_goal_value();
+            c.compute_satisfaction();
+
+			if(c.get_satisfaction()<0) {
+				eprintln!("Constraint with negative satisfaction found: {}", c.get_message());
+			} else if c.get_satisfaction() > 10 {
+				eprintln!("Constraint with satisfaction above 10 found: {}", c.get_message());
+			}
+
+			if(c.is_hard() && c.get_satisfaction()<10) {
+				self.satisfaction = 0;
+				return;
+			}
+			if c.is_hard() { continue; }
+            total_satisfaction += (c.get_satisfaction() as i16) * (c.get_importance() as i16);
+            total_importance += c.get_importance() as i16;
         }
-        self.statisfaction = (total_statisfaction/total_importance) as i8;
+        self.satisfaction = (total_satisfaction/total_importance) as i8;
     }
 
     pub fn freeze(&mut self) {
@@ -111,12 +131,26 @@ pub trait ConstraintTrait {
     fn compute_initial_value(&self);
     fn compute_current_value(&self);
     fn compute_goal_value(&self);
-
     fn compute_satisfaction(&self);
+    fn get_transformations(&self) -> Vec<Box<dyn Transformation>>;
+
     fn get_satisfaction(&self) -> i8;
     fn is_satisfied(&self, satisfaction_resolution: f64) -> bool {
         ((10 - self.get_satisfaction()) as f64) < satisfaction_resolution
     }
+
+    fn get_message(&self) -> String {
+        format!(
+            "{},agentid={},type={},pri={},imp={},s={}",
+            self.get_agent().get_agent_type(),
+            self.get_agent().get_id(),
+            std::any::type_name::<Self>(),
+            self.get_priority(),
+            self.get_importance(),
+            self.get_satisfaction()
+        )
+    }
+
 }
 
 impl Constraint {
@@ -153,6 +187,9 @@ impl Constraint {
 }
 
 
+
+pub trait Transformation {
+}
 
 /*
 pub trait compute_statisfaction {
