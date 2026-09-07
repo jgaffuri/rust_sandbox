@@ -1,6 +1,9 @@
 use crate::ragen::base::Feature;
 
+//See https://github.com/eurostat/JGiscoTools/tree/master/modules/agent/src/main/java/eu/europa/ec/eurostat/jgiscotools/agent
+
 pub struct Agent {
+    id: u32,
     feature: Feature,
     statisfaction: i8,
     constraints: Vec<Constraint>,
@@ -8,6 +11,7 @@ pub struct Agent {
     deleted: bool,
     frozen: bool,
 }
+static mut AGENT_ID: u32 = 0;
 
 //#[derive(Debug)]
 pub struct Constraint {
@@ -24,6 +28,9 @@ pub struct AgenState {
     statisfaction: i8,
 }
 
+pub struct SizeConstraint {
+    pub constraint: Constraint,
+}
 
 /*
 pub trait compute_statisfaction {
@@ -34,6 +41,10 @@ pub trait compute_statisfaction {
 impl Agent {
     pub fn new(feature:Feature) -> Self {
         Agent {
+            id: unsafe {
+                AGENT_ID += 1;
+                AGENT_ID
+            },
             feature: feature,
             statisfaction: 0,
             constraints: Vec::new(),
@@ -41,6 +52,10 @@ impl Agent {
             deleted: false,
             frozen: false,
         }
+    }
+
+    pub fn get_id(&self) -> u32 {
+        self.id
     }
 
     pub fn components(&self) -> &Vec<Agent> {
