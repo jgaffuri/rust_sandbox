@@ -13,30 +13,6 @@ pub struct Agent {
 }
 static mut AGENT_ID: u32 = 0;
 
-//#[derive(Debug)]
-pub struct Constraint {
-    pub agent: Agent,
-    pub statisfaction: i8,
-    pub importance: i8,
-    pub priority: i8,
-    pub hard_constraint: bool,
-}
-
-//TODO check in jgiscotools
-pub struct AgenState {
-    feature: Feature,
-    statisfaction: i8,
-}
-
-pub struct SizeConstraint {
-    pub constraint: Constraint,
-}
-
-/*
-pub trait compute_statisfaction {
-    fn compute_statisfaction(&mut self);
-}
- */
 
 impl Agent {
     pub fn new(feature:Feature) -> Self {
@@ -106,4 +82,67 @@ impl Agent {
         //TODO
     }
 
+}
+
+
+/*/TODO check in jgiscotools
+pub struct AgenState {
+    feature: Feature,
+    statisfaction: i8,
+}*/
+
+
+//#[derive(Debug)]
+pub struct Constraint {
+    agent: Agent,
+    statisfaction: i8,
+    importance: i8,
+    priority: i8,
+    hard: bool,
+}
+
+impl Constraint {
+    pub fn new(agent: Agent, statisfaction: i8, importance: i8, priority: i8, hard: bool) -> Self {
+        Constraint {
+            agent,
+            statisfaction,
+            importance,
+            priority,
+            hard,
+        }
+    }
+
+    pub fn get_agent(&self) -> &Agent {
+        &self.agent
+    }
+
+    pub fn get_statisfaction(&self) -> i8 {
+        self.statisfaction
+    }
+
+    pub fn get_importance(&self) -> i8 {
+        self.importance
+    }
+
+    pub fn get_priority(&self) -> i8 {
+        self.priority
+    }
+
+    pub fn is_hard(&self) -> bool {
+        self.hard
+    }
+
+}
+
+
+
+/*
+pub trait compute_statisfaction {
+    fn compute_statisfaction(&mut self);
+}
+ */
+
+
+pub struct SizeConstraint {
+    pub constraint: Constraint,
 }
