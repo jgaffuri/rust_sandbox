@@ -12,6 +12,7 @@ pub struct Agent {
     frozen: bool,
 }
 static mut AGENT_ID: u64 = 0;
+pub static SATISFACTION_RESOLUTION: f64 = 0.00001;
 
 
 impl Agent {
@@ -50,6 +51,11 @@ impl Agent {
     pub fn get_satisfaction(&self) -> f64 {
         self.satisfaction
     }
+
+	pub fn is_satisfied(&self) -> bool {
+        10.0 - self.get_satisfaction() < SATISFACTION_RESOLUTION;
+    }
+
 
     pub fn add_constraint(&mut self, constraint: Box<dyn Constraint>) {
         self.constraints.push(constraint);
@@ -125,6 +131,7 @@ pub trait Constraint {
 	// A constraint whose satisfaction is expected to be 0 or 10, which has to be satisfied. Example: a topological constraint.
     fn is_hard(&self) -> bool;
 
+    //TODO ensures it is used on constraint creation
     fn compute_initial_value(&self);
     fn compute_current_value(&self);
     fn compute_goal_value(&self);
