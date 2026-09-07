@@ -6,7 +6,7 @@ pub struct Agent {
     id: u32,
     feature: Feature,
     satisfaction: i8,
-    constraints: Vec<Box<dyn ConstraintTrait>>,
+    constraints: Vec<Box<dyn Constraint>>,
     components: Vec<Agent>,
     deleted: bool,
     frozen: bool,
@@ -51,7 +51,7 @@ impl Agent {
         self.satisfaction
     }
 
-    pub fn add_constraint(&mut self, constraint: Box<dyn ConstraintTrait>) {
+    pub fn add_constraint(&mut self, constraint: Box<dyn Constraint>) {
         self.constraints.push(constraint);
     }
 
@@ -106,15 +106,15 @@ impl Agent {
 
 
 //#[derive(Debug)]
-pub struct Constraint {
-    agent: Agent,
-    statisfaction: i8,
-    importance: i8,
-    priority: i8,
-    hard: bool,
+pub struct ConstraintStruct {
+    pub agent: Agent,
+    pub statisfaction: i8,
+    pub importance: i8,
+    pub priority: i8,
+    pub hard: bool,
 }
 
-pub trait ConstraintTrait {
+pub trait Constraint {
     fn get_agent(&self) -> &Agent;
 
     fn get_importance(&self) -> i8;
@@ -147,45 +147,12 @@ pub trait ConstraintTrait {
 
 }
 
-impl Constraint {
-    pub fn new(agent: Agent, statisfaction: i8, importance: i8, priority: i8, hard: bool) -> Self {
-        Constraint {
-            agent,
-            statisfaction,
-            importance,
-            priority,
-            hard,
-        }
-    }
-
-    pub fn get_agent(&self) -> &Agent {
-        &self.agent
-    }
-
-    pub fn get_statisfaction(&self) -> i8 {
-        self.statisfaction
-    }
-
-    pub fn get_importance(&self) -> i8 {
-        self.importance
-    }
-
-    pub fn get_priority(&self) -> i8 {
-        self.priority
-    }
-
-    pub fn is_hard(&self) -> bool {
-        self.hard
-    }
-
-}
-
 
 /**
  * A constraint to force a transformation to be applied.
  * The moment when the transformation is to be applied can be adjusted with the constraint priority.
  */
-pub trait ConstraintOneShot : ConstraintTrait {
+pub trait ConstraintOneShot : Constraint {
     fn get_transformation(&self) -> Box<dyn Transformation>;
     fn compute_current_value(&self) {}
     fn is_applied(&self) -> bool;
@@ -238,7 +205,3 @@ pub trait TransformationNonCancellable<> : Transformation {
 	fn is_cancelable(&self) { false; }
 }
 
-
-pub struct SizeConstraint {
-    pub constraint: Constraint,
-}
