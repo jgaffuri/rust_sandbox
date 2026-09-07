@@ -112,28 +112,39 @@ impl Agent {
         self.frozen
     }
 
+
+	// retrieve list of candidate transformations to try improving agent's satisfaction
+    pub fn get_transformations(&self) -> Vec<Box<dyn Transformation>> {
+        let mut tr: Vec<Box<dyn Transformation>> = Vec::new();
+        if self.deleted { return tr; }
+
+        //TODO sort constraints by priority
+        for c in &self.constraints {
+            if c.get_satisfaction() == 10.0 { continue; }
+            let mut c_tr = c.get_transformations();
+            tr.append(&mut c_tr);
+        }
+        tr
+    }
+
+    // activate agent: try to improve its satisfaction by applying transformations proposed by its constraints.
     pub fn activate(&mut self) {
 
+        if self.is_frozen() || self.deleted { return; }
 
-
-
-/*
-		//public void activate(PrintWriter logWriter) {
-		if(LOGGER.isTraceEnabled()) LOGGER.trace("Activate agent: "+this.id);
-
-		if(isFrozen() || isDeleted()) return;
-
-		//compute satisfaction
-		this.computeSatisfaction();
-		if(LOGGER.isTraceEnabled()) LOGGER.trace(" satisf = "+this.getSatisfaction());
+        //compute satisfaction
+        self.compute_satisfaction();
 
 		//satisfaction perfect: nothing to do.
-		if(isSatisfied()) return;
+        if self.is_satisfied() { return; }
 
-		double sat1 = this.getSatisfaction();
+        // store current satisfaction
+		let sat1 = self.get_satisfaction();
 
 		//get list of candidate transformations from agent
-		List<Transformation<?>> ts = this.getTransformations();
+        let ts = self.get_transformations();
+
+/*
 		while(ts.size()>0){
 			Transformation<?> t = ts.get(0);
 			ts.remove(0);
