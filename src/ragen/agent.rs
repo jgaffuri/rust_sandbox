@@ -168,16 +168,6 @@ pub trait ConstraintOneShot : Constraint {
         tr
     }
 
-/*
-    @Override
-	public List<Transformation<T>> getTransformations() {
-		ArrayList<Transformation<T>> tr = new ArrayList<Transformation<T>>();
-		tr.add(transformation);
-		applied = true;
-		return tr;
-	}*/
-
-
 }
 
 
