@@ -107,9 +107,12 @@ pub trait ConstraintTrait {
     fn get_importance(&self) -> i8;
     fn get_priority(&self) -> i8;
     fn is_hard(&self) -> bool;
-    fn compute_current_value(&self) -> i8;
 
-    fn compute_satisfaction(&self) -> String;
+    fn compute_initial_value(&self);
+    fn compute_current_value(&self);
+    fn compute_goal_value(&self);
+
+    fn compute_satisfaction(&self);
     fn get_satisfaction(&self) -> i8;
     fn is_satisfied(&self, satisfaction_resolution: f64) -> bool {
         ((10 - self.get_satisfaction()) as f64) < satisfaction_resolution
