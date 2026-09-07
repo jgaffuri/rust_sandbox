@@ -71,13 +71,13 @@ impl Agent {
             c.compute_goal_value();
             c.compute_satisfaction();
 
-			if(c.get_satisfaction()<0) {
+			if c.get_satisfaction()<0 {
 				eprintln!("Constraint with negative satisfaction found: {}", c.get_message());
 			} else if c.get_satisfaction() > 10 {
 				eprintln!("Constraint with satisfaction above 10 found: {}", c.get_message());
 			}
 
-			if(c.is_hard() && c.get_satisfaction()<10) {
+			if c.is_hard() && c.get_satisfaction()<10 {
 				self.satisfaction = 0;
 				return;
 			}
@@ -128,6 +128,7 @@ pub trait ConstraintTrait {
     fn get_transformations(&self) -> Vec<Box<dyn Transformation>>;
 
     fn get_satisfaction(&self) -> i8;
+    fn set_satisfaction(&self, satisfaction_resolution: i8);
     fn is_satisfied(&self, satisfaction_resolution: f64) -> bool {
         ((10 - self.get_satisfaction()) as f64) < satisfaction_resolution
     }
@@ -187,6 +188,29 @@ impl Constraint {
 pub trait ConstraintOneShot : ConstraintTrait {
     fn get_transformation(&self) -> Box<dyn Transformation>;
     fn compute_current_value(&self) {}
+    fn is_applied(&self) -> bool;
+    fn set_applied(&self, applied: bool);
+	fn compute_satisfaction(&self) {
+        let satisfaction = if self.is_applied() { 10 } else { 0 };
+        self.set_satisfaction(satisfaction);
+    }
+
+    fn get_transformations(&self) -> Vec<Box<dyn Transformation>> {
+        let tr: Vec<Box<dyn Transformation>> = vec![self.get_transformation()];
+        self.set_applied(true);
+        tr
+    }
+
+/*
+    @Override
+	public List<Transformation<T>> getTransformations() {
+		ArrayList<Transformation<T>> tr = new ArrayList<Transformation<T>>();
+		tr.add(transformation);
+		applied = true;
+		return tr;
+	}*/
+
+
 }
 
 
