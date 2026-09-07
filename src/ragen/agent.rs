@@ -61,7 +61,7 @@ impl Agent {
 
     pub fn compute_satisfaction(&mut self) {
         if self.constraints.is_empty() || self.deleted {
-            self.satisfaction = 10;
+            self.satisfaction = 10.0;
             return;
         }
         let mut total_satisfaction: f64 = 0.0;
@@ -71,7 +71,7 @@ impl Agent {
             c.compute_goal_value();
             c.compute_satisfaction();
 
-			if c.get_satisfaction()<0 {
+			if c.get_satisfaction() < 0.0 {
 				eprintln!("Constraint with negative satisfaction found: {}", c.get_message());
 			} else if c.get_satisfaction() > 10.0 {
 				eprintln!("Constraint with satisfaction above 10 found: {}", c.get_message());
