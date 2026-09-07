@@ -113,7 +113,66 @@ impl Agent {
     }
 
     pub fn activate(&mut self) {
-        //TODO
+
+
+
+
+/*
+		//public void activate(PrintWriter logWriter) {
+		if(LOGGER.isTraceEnabled()) LOGGER.trace("Activate agent: "+this.id);
+
+		if(isFrozen() || isDeleted()) return;
+
+		//compute satisfaction
+		this.computeSatisfaction();
+		if(LOGGER.isTraceEnabled()) LOGGER.trace(" satisf = "+this.getSatisfaction());
+
+		//satisfaction perfect: nothing to do.
+		if(isSatisfied()) return;
+
+		double sat1 = this.getSatisfaction();
+
+		//get list of candidate transformations from agent
+		List<Transformation<?>> ts = this.getTransformations();
+		while(ts.size()>0){
+			Transformation<?> t = ts.get(0);
+			ts.remove(0);
+
+			//save current state
+			if(t.isCancelable()) ((TransformationCancellable<?>)t).storeState();
+
+			//apply transformation
+			if(LOGGER.isTraceEnabled()) LOGGER.trace(" apply "+t.toString()+" on "+this.toString() );
+			t.apply();
+
+			//TODO check proposing constraint satisfaction improvement first. Propose generic validity function?
+
+			//get new satisfaction
+			this.computeSatisfaction();
+			double sat2 = this.getSatisfaction();
+			if(LOGGER.isTraceEnabled()) LOGGER.trace(" satisf = "+this.getSatisfaction());
+
+			//log
+			//if(logWriter != null) logWriter.println( getMessage(t, sat1, sat2) );
+
+			if(isSatisfied()) {
+				//perfect state reached: end
+				return;
+			} else if(sat2 - sat1 > SATISFACTION_RESOLUTION){
+				//improvement: get new list of candidate transformations
+				ts = this.getTransformations();
+				sat1 = sat2;
+			} else {
+				//no improvement: go back to previous state, if possible
+				if(t.isCancelable())
+					((TransformationCancellable<?>)t).cancel();
+				else if(sat2 - sat1 < 0)
+					LOGGER.warn("Non cancellable transformation "+t.getClass().getSimpleName()+" resulted in satisfaction decrease for agent "+this.getId() + "   SatIni="+sat1+" --- satFin="+sat2+" --- diff="+(sat2-sat1));
+			}
+		}
+*/
+
+
     }
 
 }
