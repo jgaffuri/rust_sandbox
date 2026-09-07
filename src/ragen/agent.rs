@@ -3,15 +3,15 @@ use crate::ragen::base::Feature;
 //See https://github.com/eurostat/JGiscoTools/tree/master/modules/agent/src/main/java/eu/europa/ec/eurostat/jgiscotools/agent
 
 pub struct Agent {
-    id: u32,
+    id: u64,
     feature: Feature,
-    satisfaction: i8,
+    satisfaction: f64,
     constraints: Vec<Box<dyn Constraint>>,
     components: Vec<Agent>,
     deleted: bool,
     frozen: bool,
 }
-static mut AGENT_ID: u32 = 0;
+static mut AGENT_ID: u64 = 0;
 
 
 impl Agent {
@@ -22,7 +22,7 @@ impl Agent {
                 AGENT_ID
             },
             feature: feature,
-            satisfaction: 0,
+            satisfaction: 0.0,
             constraints: Vec::new(),
             components: Vec::new(),
             deleted: false,
@@ -30,7 +30,7 @@ impl Agent {
         }
     }
 
-    pub fn get_id(&self) -> u32 {
+    pub fn get_id(&self) -> u64 {
         self.id
     }
 
@@ -47,7 +47,7 @@ impl Agent {
         &self.feature
     }
 
-    pub fn get_satisfaction(&self) -> i8 {
+    pub fn get_satisfaction(&self) -> f64 {
         self.satisfaction
     }
 
@@ -64,8 +64,8 @@ impl Agent {
             self.satisfaction = 10;
             return;
         }
-        let mut total_satisfaction: i16 = 0;
-        let mut total_importance: i16 = 0;
+        let mut total_satisfaction: f64 = 0.0;
+        let mut total_importance: f64 = 0.0;
         for c in &self.constraints {
             c.compute_current_value();
             c.compute_goal_value();
@@ -73,19 +73,19 @@ impl Agent {
 
 			if c.get_satisfaction()<0 {
 				eprintln!("Constraint with negative satisfaction found: {}", c.get_message());
-			} else if c.get_satisfaction() > 10 {
+			} else if c.get_satisfaction() > 10.0 {
 				eprintln!("Constraint with satisfaction above 10 found: {}", c.get_message());
 			}
 
-			if c.is_hard() && c.get_satisfaction()<10 {
-				self.satisfaction = 0;
+			if c.is_hard() && c.get_satisfaction() < 10.0 {
+				self.satisfaction = 0.0;
 				return;
 			}
 			if c.is_hard() { continue; }
-            total_satisfaction += (c.get_satisfaction() as i16) * (c.get_importance() as i16);
-            total_importance += c.get_importance() as i16;
+            total_satisfaction += c.get_satisfaction() * c.get_importance();
+            total_importance += c.get_importance();
         }
-        self.satisfaction = (total_satisfaction/total_importance) as i8;
+        self.satisfaction = total_satisfaction/total_importance;
     }
 
     pub fn freeze(&mut self) {
@@ -108,17 +108,21 @@ impl Agent {
 //#[derive(Debug)]
 pub struct ConstraintStruct {
     pub agent: Agent,
-    pub statisfaction: i8,
-    pub importance: i8,
-    pub priority: i8,
+    pub statisfaction: f64,
+    pub importance: f64,
+    pub priority: f64,
     pub hard: bool,
 }
 
 pub trait Constraint {
     fn get_agent(&self) -> &Agent;
 
-    fn get_importance(&self) -> i8;
-    fn get_priority(&self) -> i8;
+    // importance (used for soft constraints only, to compute agent's overall satisfaction).
+    fn get_importance(&self) -> f64;
+
+    fn get_priority(&self) -> f64;
+
+	// A constraint whose satisfaction is expected to be 0 or 10, which has to be satisfied. Example: a topological constraint.
     fn is_hard(&self) -> bool;
 
     fn compute_initial_value(&self);
@@ -127,10 +131,11 @@ pub trait Constraint {
     fn compute_satisfaction(&self);
     fn get_transformations(&self) -> Vec<Box<dyn Transformation>>;
 
-    fn get_satisfaction(&self) -> i8;
-    fn set_satisfaction(&self, satisfaction_resolution: i8);
+    //from 0 to 10 (satisfied)
+    fn get_satisfaction(&self) -> f64;
+    fn set_satisfaction(&self, satisfaction: f64);
     fn is_satisfied(&self, satisfaction_resolution: f64) -> bool {
-        ((10 - self.get_satisfaction()) as f64) < satisfaction_resolution
+        ((10.0 - self.get_satisfaction()) as f64) < satisfaction_resolution
     }
 
     fn get_message(&self) -> String {
@@ -158,7 +163,7 @@ pub trait ConstraintOneShot : Constraint {
     fn is_applied(&self) -> bool;
     fn set_applied(&self, applied: bool);
 	fn compute_satisfaction(&self) {
-        let satisfaction = if self.is_applied() { 10 } else { 0 };
+        let satisfaction = if self.is_applied() { 10.0 } else { 0.0 };
         self.set_satisfaction(satisfaction);
     }
 
