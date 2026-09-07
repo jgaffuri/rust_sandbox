@@ -65,33 +65,41 @@ impl Agent {
         self.constraints.clear();
     }
 
+    // by default, the average of the satisfactions of the soft constraints. 0 if any hard constraint is unsatisfied.
     pub fn compute_satisfaction(&mut self) {
         if self.constraints.is_empty() || self.deleted {
             self.satisfaction = 10.0;
             return;
         }
-        let mut total_satisfaction: f64 = 0.0;
-        let mut total_importance: f64 = 0.0;
+        let mut t_sat: f64 = 0.0;
+        let mut t_imp: f64 = 0.0;
         for c in &self.constraints {
-            c.compute_current_value();
-            c.compute_goal_value();
-            c.compute_satisfaction();
+            let imp = c.get_importance();
+            if imp <= 0.0 { continue; }
 
-			if c.get_satisfaction() < 0.0 {
+            c.compute_current_value();
+            c.compute_goal_value(); //TODO may not be necessary ? The goal value computation may be needed only once, at constraint creation
+
+            // compute constraint satisfaction
+            c.compute_satisfaction();
+            let sat = c.get_satisfaction();
+			if sat < 0.0 {
 				eprintln!("Constraint with negative satisfaction found: {}", c.get_message());
-			} else if c.get_satisfaction() > 10.0 {
+			} else if sat > 10.0 {
 				eprintln!("Constraint with satisfaction above 10 found: {}", c.get_message());
 			}
 
-			if c.is_hard() && c.get_satisfaction() < 10.0 {
+            // case constraint is hard
+			if c.is_hard() && sat < 10.0 {
 				self.satisfaction = 0.0;
 				return;
 			}
 			if c.is_hard() { continue; }
-            total_satisfaction += c.get_satisfaction() * c.get_importance();
-            total_importance += c.get_importance();
+
+            t_sat += sat * imp;
+            t_imp += imp;
         }
-        self.satisfaction = total_satisfaction/total_importance;
+        if t_imp == 0.0 { self.satisfaction = 10.0; } else { self.satisfaction = t_sat/t_imp; }
     }
 
     pub fn freeze(&mut self) {
@@ -129,6 +137,7 @@ pub trait Constraint {
     fn get_priority(&self) -> f64;
 
 	// A constraint whose satisfaction is expected to be 0 or 10, which has to be satisfied. Example: a topological constraint.
+    //TODO a hard constraint does not need importance value ?
     fn is_hard(&self) -> bool;
 
     //TODO ensures it is used on constraint creation
