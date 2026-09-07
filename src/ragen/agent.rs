@@ -142,13 +142,20 @@ impl Agent {
 		let sat1 = self.get_satisfaction();
 
 		//get list of candidate transformations from agent
-        let ts = self.get_transformations();
+        let mut ts = self.get_transformations();
+
+        while ts.len() > 0 {
+            // pop first transformation from list
+            let t = ts.remove(0);
+
+            //save current state
+            if t.is_cancelable() {
+                t.store_state();
+            }
+
+
 
 /*
-		while(ts.size()>0){
-			Transformation<?> t = ts.get(0);
-			ts.remove(0);
-
 			//save current state
 			if(t.isCancelable()) ((TransformationCancellable<?>)t).storeState();
 
@@ -180,10 +187,9 @@ impl Agent {
 				else if(sat2 - sat1 < 0)
 					LOGGER.warn("Non cancellable transformation "+t.getClass().getSimpleName()+" resulted in satisfaction decrease for agent "+this.getId() + "   SatIni="+sat1+" --- satFin="+sat2+" --- diff="+(sat2-sat1));
 			}
-		}
+
 */
-
-
+        }
     }
 
 }
@@ -267,13 +273,13 @@ pub trait ConstraintOneShot : Constraint {
 pub trait Transformation {
     fn get_agent(&self) -> &Agent;
     fn apply(&self);
-	fn is_cancelable(&self);
+	fn is_cancelable(&self) -> bool;
     fn to_string(self) -> String;
 }
 
 /** A transformation, which can be cancelled. */
 pub trait TransformationCancellable<> : Transformation {
-	fn is_cancelable(&self) { true; }
+	fn is_cancelable(&self) -> bool { true }
 	fn store_state(&self);	
 	fn cancel(&self);	
 }
@@ -283,6 +289,6 @@ pub trait TransformationCancellable<> : Transformation {
  * In theory, all transformations could be cancellable, as soon as the initial state can be stored. In practice, it is not always easy and implemented.
  */
 pub trait TransformationNonCancellable<> : Transformation {
-	fn is_cancelable(&self) { false; }
+	fn is_cancelable(&self) -> bool { false }
 }
 
