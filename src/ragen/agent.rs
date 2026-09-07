@@ -111,8 +111,8 @@ pub trait ConstraintTrait {
 
     fn compute_satisfaction(&self) -> String;
     fn get_satisfaction(&self) -> i8;
-    fn is_satisfied(&self, satisfactionResolution: f64) -> bool {
-        ((10 - self.get_satisfaction()) as f64) < satisfactionResolution
+    fn is_satisfied(&self, satisfaction_resolution: f64) -> bool {
+        ((10 - self.get_satisfaction()) as f64) < satisfaction_resolution
     }
 }
 
