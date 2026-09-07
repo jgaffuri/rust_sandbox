@@ -269,26 +269,20 @@ pub trait ConstraintOneShot : Constraint {
 
 
 
-//TODO use enum instead
+/** 
+ * A transformation, which cannot be cancelled.
+ * In theory, all transformations could be cancellable, as soon as the initial state can be stored. In practice, it is not always easy and implemented.
+ */
+
 pub trait Transformation {
     fn get_agent(&self) -> &Agent;
     fn apply(&self);
-	fn is_cancelable(&self) -> bool;
+	//fn is_cancelable(&self) -> bool;
     fn to_string(self) -> String;
 }
 
 /** A transformation, which can be cancelled. */
 pub trait TransformationCancellable<> : Transformation {
-	fn is_cancelable(&self) -> bool { true }
 	fn store_state(&self);	
 	fn cancel(&self);	
 }
-
-/** 
- * A transformation, which cannot be cancelled.
- * In theory, all transformations could be cancellable, as soon as the initial state can be stored. In practice, it is not always easy and implemented.
- */
-pub trait TransformationNonCancellable<> : Transformation {
-	fn is_cancelable(&self) -> bool { false }
-}
-
