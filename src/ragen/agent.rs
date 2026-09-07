@@ -99,7 +99,7 @@ impl Agent {
             t_sat += sat * imp;
             t_imp += imp;
         }
-        if t_imp == 0.0 { self.satisfaction = 10.0; } else { self.satisfaction = t_sat/t_imp; }
+        if t_imp == 0.0 { self.satisfaction = 10.0; } else { self.satisfaction = t_sat / t_imp; }
     }
 
     pub fn freeze(&mut self) {
