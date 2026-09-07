@@ -184,7 +184,7 @@ impl Constraint {
 pub trait Transformation {
     fn get_agent(&self) -> &Agent;
     fn apply(&self);
-    fn is_cancelable(self) -> bool;
+	fn is_cancelable(&self) { false; }
     fn to_string(self) -> String;
 }
 
@@ -193,7 +193,6 @@ pub trait TransformationCancellable : Transformation {
 	fn store_state(&self);	
 	fn cancel(&self);	
 }
-
 
 
 pub struct SizeConstraint {
