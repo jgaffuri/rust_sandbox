@@ -180,7 +180,22 @@ impl Constraint {
 }
 
 
+/**
+ * A constraint to force a transformation to be applied.
+ * The moment when the transformation is to be applied can be adjusted with the constraint priority.
+ */
+pub trait ConstraintOneShot : ConstraintTrait {
+    fn get_transformation(&self) -> Box<dyn Transformation>;
+    fn compute_current_value(&self) {}
+}
 
+
+
+//TODO use enum instead
+/** 
+ * A transformation, which cannot be cancelled.
+ * In theory, all transformations could be cancellable, as soon as the initial state can be stored. In practice, it is not always easy and implemented.
+ */
 pub trait Transformation {
     fn get_agent(&self) -> &Agent;
     fn apply(&self);
@@ -188,7 +203,8 @@ pub trait Transformation {
     fn to_string(self) -> String;
 }
 
-pub trait TransformationCancellable : Transformation {
+/** A transformation, which can be cancelled. */
+pub trait TransformationCancellable<> : Transformation {
 	fn is_cancelable(&self) { true; }
 	fn store_state(&self);	
 	fn cancel(&self);	
