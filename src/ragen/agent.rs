@@ -218,7 +218,7 @@ pub trait Constraint {
 
     //from 0 to 10 (satisfied)
     fn get_satisfaction(&self) -> f64;
-    fn set_satisfaction(&self, satisfaction: f64);
+    fn set_satisfaction(&mut self, satisfaction: f64);
     fn is_satisfied(&self, satisfaction_resolution: f64) -> bool {
         ((10.0 - self.get_satisfaction()) as f64) < satisfaction_resolution
     }
@@ -247,7 +247,7 @@ pub trait ConstraintOneShot : Constraint {
     fn compute_current_value(&self) {}
     fn is_applied(&self) -> bool;
     fn set_applied(&self, applied: bool);
-	fn compute_satisfaction(&self) {
+	fn compute_satisfaction(&mut self) {
         let satisfaction = if self.is_applied() { 10.0 } else { 0.0 };
         self.set_satisfaction(satisfaction);
     }
