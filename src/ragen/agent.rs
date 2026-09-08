@@ -1,3 +1,5 @@
+use std::cmp::Reverse;
+
 use crate::ragen::base::Feature;
 
 //See https://github.com/eurostat/JGiscoTools/tree/master/modules/agent/src/main/java/eu/europa/ec/eurostat/jgiscotools/agent
@@ -114,11 +116,14 @@ impl Agent {
 
 
 	// retrieve list of candidate transformations to try improving agent's satisfaction
-    pub fn get_transformations(&self) -> Vec<Box<dyn Transformation>> {
+    fn get_transformations(&mut self) -> Vec<Box<dyn Transformation>> {
         let mut tr: Vec<Box<dyn Transformation>> = Vec::new();
         if self.deleted { return tr; }
 
-        //TODO sort constraints by priority
+        //sort constraints by priority
+        //TODO need to do that only once ? Or when a constraint is added ?
+        self.constraints.sort_by_key(|c| Reverse(c.get_priority()));
+
         for c in &self.constraints {
             if c.get_satisfaction() == 10.0 { continue; }
             let mut c_tr = c.get_transformations();
@@ -139,7 +144,7 @@ impl Agent {
         if self.is_satisfied() { return; }
 
         // store current satisfaction
-		let sat1 = self.get_satisfaction();
+		let mut sat1 = self.get_satisfaction();
 
 		//get list of candidate transformations from agent
         let mut ts = self.get_transformations();
@@ -169,7 +174,7 @@ impl Agent {
 				sat1 = sat2;
 			} else {
 				//no improvement: go back to previous state, if possible
-				if t.isCancelable() {
+				if t.is_cancellable() {
 					t.cancel();
                 }
 				else if sat2 - sat1 < 0.0 {
@@ -188,7 +193,7 @@ pub struct ConstraintStruct {
     pub agent: Agent,
     pub statisfaction: f64,
     pub importance: f64,
-    pub priority: f64,
+    pub priority: i8,
     pub hard: bool,
 }
 
@@ -198,7 +203,7 @@ pub trait Constraint {
     // importance (used for soft constraints only, to compute agent's overall satisfaction).
     fn get_importance(&self) -> f64;
 
-    fn get_priority(&self) -> f64;
+    fn get_priority(&self) -> i8;
 
 	// A constraint whose satisfaction is expected to be 0 or 10, which has to be satisfied. Example: a topological constraint.
     //TODO a hard constraint does not need importance value ?
@@ -258,7 +263,7 @@ pub trait ConstraintOneShot : Constraint {
 
 
 
-trait Transformation {
+pub trait Transformation {
     fn get_agent(&self) -> &Agent;
     fn apply(&self);
  
@@ -269,13 +274,11 @@ trait Transformation {
     fn to_string(self) -> String;
 }
 
-/** 
- * A transformation, which cannot be cancelled.
- * In theory, all transformations could be cancellable, as soon as the initial state can be stored. In practice, it is not always easy and implemented.
- */
-
+// A transformation, which cannot be cancelled.
+// In theory, all transformations could be cancellable, as soon as the initial state can be stored. In practice, it is not always easy and implemented.
 //pub trait TransformationNoncancellable : Transformation {}
 
-/** A transformation, which can be cancelled. */
+
+//A transformation, which can be cancelled.
 //pub trait TransformationCancellable<> : Transformation {
 
