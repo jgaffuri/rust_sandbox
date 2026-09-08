@@ -6,6 +6,7 @@ use std::time::Instant;
 use geo::{MinimumRotatedRect};
 
 pub mod ragen;
+pub mod gene;
 
 use crate::ragen::io::{load_features, save_features, LoadFeaturesOptions};
 use crate::ragen::geom_utils::{geo_to_geos, geos_to_geo, elongation_measure};
