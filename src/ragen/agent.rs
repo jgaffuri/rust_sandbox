@@ -149,46 +149,34 @@ impl Agent {
             let t = ts.remove(0);
 
             //save current state
-            if t.is_cancelable() {
-                t.store_state();
-            }
-
-
-
-/*
-			//save current state
-			if(t.isCancelable()) ((TransformationCancellable<?>)t).storeState();
+            if t.is_cancellable() { t.store_state(); }
 
 			//apply transformation
-			if(LOGGER.isTraceEnabled()) LOGGER.trace(" apply "+t.toString()+" on "+this.toString() );
-			t.apply();
+            t.apply();
 
 			//TODO check proposing constraint satisfaction improvement first. Propose generic validity function?
 
-			//get new satisfaction
-			this.computeSatisfaction();
-			double sat2 = this.getSatisfaction();
-			if(LOGGER.isTraceEnabled()) LOGGER.trace(" satisf = "+this.getSatisfaction());
+            //get new satisfaction
+			self.compute_satisfaction();
+			let sat2 = self.get_satisfaction();
 
-			//log
-			//if(logWriter != null) logWriter.println( getMessage(t, sat1, sat2) );
-
-			if(isSatisfied()) {
+			if self.is_satisfied() {
 				//perfect state reached: end
-				return;
-			} else if(sat2 - sat1 > SATISFACTION_RESOLUTION){
+				return
+			} else if sat2 - sat1 > SATISFACTION_RESOLUTION {
 				//improvement: get new list of candidate transformations
-				ts = this.getTransformations();
+				ts = self.get_transformations();
 				sat1 = sat2;
 			} else {
 				//no improvement: go back to previous state, if possible
-				if(t.isCancelable())
-					((TransformationCancellable<?>)t).cancel();
-				else if(sat2 - sat1 < 0)
-					LOGGER.warn("Non cancellable transformation "+t.getClass().getSimpleName()+" resulted in satisfaction decrease for agent "+this.getId() + "   SatIni="+sat1+" --- satFin="+sat2+" --- diff="+(sat2-sat1));
+				if t.isCancelable() {
+					t.cancel();
+                }
+				else if sat2 - sat1 < 0.0 {
+					//("Non cancellable transformation "+t.getClass().getSimpleName()+" resulted in satisfaction decrease for agent "+this.getId() + "   SatIni="+sat1+" --- satFin="+sat2+" --- diff="+(sat2-sat1));
+                }
 			}
 
-*/
         }
     }
 
@@ -270,9 +258,15 @@ pub trait ConstraintOneShot : Constraint {
 
 
 
-enum Transformation {
-    TransformationNoncancellable(23),
-    TransformationCancellable(435),
+trait Transformation {
+    fn get_agent(&self) -> &Agent;
+    fn apply(&self);
+ 
+    fn is_cancellable(&self) -> bool;
+	fn store_state(&self);	
+	fn cancel(&self);	
+
+    fn to_string(self) -> String;
 }
 
 /** 
@@ -280,14 +274,8 @@ enum Transformation {
  * In theory, all transformations could be cancellable, as soon as the initial state can be stored. In practice, it is not always easy and implemented.
  */
 
-pub trait TransformationNoncancellable<> {
-    fn get_agent(&self) -> &Agent;
-    fn apply(&self);
-    fn to_string(self) -> String;
-}
+//pub trait TransformationNoncancellable : Transformation {}
 
 /** A transformation, which can be cancelled. */
-pub trait TransformationCancellable<> : TransformationNoncancellable {
-	fn store_state(&self);	
-	fn cancel(&self);	
-}
+//pub trait TransformationCancellable<> : Transformation {
+
