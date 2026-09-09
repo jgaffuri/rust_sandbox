@@ -1,3 +1,5 @@
+use geos::Geom;
+
 use crate::ragen::agent::{Constraint, ConstraintStruct};
 
 
@@ -5,6 +7,11 @@ use crate::ragen::agent::{Constraint, ConstraintStruct};
 // A constraint for surfacic agents to have a minimum size.
 pub struct SizeConstraint {
     pub constraint_data: ConstraintStruct,
+
+    initial_area:f64,
+    current_area:f64,
+    goal_area:f64,
+
 }
 
 
@@ -17,7 +24,7 @@ impl Constraint for SizeConstraint {
     fn is_hard(&self) -> bool { false }
 
     fn compute_initial_value(&self) {
-        todo!()
+        self.initial_area = self.constraint_data.agent.feature().geometry.area();
     }
 
     fn compute_current_value(&self) {
