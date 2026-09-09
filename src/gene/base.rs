@@ -1,6 +1,6 @@
 use geos::Geom;
 
-use crate::ragen::agent::{Constraint, ConstraintStruct};
+use crate::ragen::agent::{Agent, Constraint, ConstraintStruct};
 
 
 
@@ -10,12 +10,31 @@ pub struct SizeConstraint {
 
     initial_area:f64,
     current_area:f64,
-    goal_area:f64,
+    //goal_area:f64,
 
+}
+
+impl SizeConstraint {
+
+    pub fn new(agent:Agent) -> Self {
+        SizeConstraint {
+            constraint_data: ConstraintStruct {
+                agent: agent,
+                statisfaction: 0.0,
+                importance: 1.0,
+                priority: 0,
+                hard: false,
+            },
+            initial_area: -1.0,
+            current_area: -1.0,
+            //goal_area: -1.0,
+        }
+    }
 }
 
 
 impl Constraint for SizeConstraint {
+
     fn get_agent(&self) -> &crate::ragen::agent::Agent { &self.constraint_data.agent }
     fn get_importance(&self) -> f64 { self.constraint_data.importance }
     fn get_priority(&self) -> i8 { self.constraint_data.priority }
