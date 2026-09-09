@@ -23,15 +23,21 @@ impl Constraint for SizeConstraint {
     fn set_satisfaction(&mut self, satisfaction: f64) { self.constraint_data.statisfaction = satisfaction; }
     fn is_hard(&self) -> bool { false }
 
-    fn compute_initial_value(&self) {
-        self.initial_area = self.constraint_data.agent.feature().geometry.area();
+    fn compute_initial_value(&mut self) {
+        match self.constraint_data.agent.feature().geometry.area() {
+            Ok(area) => self.initial_area = area,
+            Err(e) => println!("Error: {}", e),
+        }
     }
 
-    fn compute_current_value(&self) {
-        todo!()
+    fn compute_current_value(&mut self) {
+        match self.constraint_data.agent.feature().geometry.area() {
+            Ok(area) => self.current_area = area,
+            Err(e) => println!("Error: {}", e),
+        }
     }
 
-    fn compute_goal_value(&self) {
+    fn compute_goal_value(&mut self) {
         todo!()
     }
 

@@ -75,7 +75,7 @@ impl Agent {
         }
         let mut t_sat: f64 = 0.0;
         let mut t_imp: f64 = 0.0;
-        for c in &self.constraints {
+        for c in &mut self.constraints {
             let imp = c.get_importance();
             if imp <= 0.0 { continue; }
 
@@ -210,9 +210,9 @@ pub trait Constraint {
     fn is_hard(&self) -> bool;
 
     //TODO ensures it is used on constraint creation
-    fn compute_initial_value(&self);
-    fn compute_current_value(&self);
-    fn compute_goal_value(&self);
+    fn compute_initial_value(&mut self);
+    fn compute_current_value(&mut self);
+    fn compute_goal_value(&mut self);
     fn compute_satisfaction(&self);
     fn get_transformations(&self) -> Vec<Box<dyn Transformation>>;
 
