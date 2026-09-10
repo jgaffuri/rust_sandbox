@@ -274,8 +274,9 @@ pub trait ConstraintOneShot : Constraint {
 
 pub trait Transformation {
     fn get_agent(&self) -> &Agent;
+    fn get_constraint(&self) -> &dyn Constraint;
     fn apply(&self);
- 
+
     fn is_cancellable(&self) -> bool;
 	fn store_state(&self);	
 	fn cancel(&self);	

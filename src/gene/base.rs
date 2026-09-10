@@ -1,6 +1,6 @@
 use geos::Geom;
 
-use crate::ragen::agent::{Agent, Constraint, ConstraintStruct};
+use crate::ragen::agent::{Agent, Constraint, ConstraintStruct, Transformation};
 
 
 
@@ -82,9 +82,36 @@ impl Constraint for SizeConstraint {
 		if self.constraint_data.statisfaction < 0.0  { self.constraint_data.statisfaction = 0.0; }
     }
 
-    fn get_transformations(&self) -> Vec<Box<dyn crate::ragen::agent::Transformation>> {
+    fn get_transformations(&self) -> Vec<Box<dyn Transformation>> {
         todo!()
     }
 
+}
+
+
+pub struct ScalingTransformation {
+    pub scale_factor: f64,
+}
+
+impl ScalingTransformation {
+    pub fn new(scale_factor: f64) -> Self {
+        ScalingTransformation { scale_factor }
+    }
+}
+
+impl Transformation for ScalingTransformation {
+
+
+    fn apply(&self, agent: &mut Agent) {
+        if let Some(geom) = agent.feature().geometry.clone() {
+            if let Ok(scaled_geom) = geom.scale(self.scale_factor, self.scale_factor, 0.0, 0.0) {
+                agent.feature_mut().geometry = Some(scaled_geom);
+            } else {
+                println!("Error scaling geometry for agent id={}", agent.get_id());
+            }
+        } else {
+            println!("Agent id={} has no geometry to scale", agent.get_id());
+        }
+    }
 }
 
