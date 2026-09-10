@@ -90,18 +90,21 @@ impl Constraint for SizeConstraint {
 
 
 pub struct ScalingTransformation {
+    pub agent: Agent,
+    pub constraint: Box<dyn Constraint>,
     pub scale_factor: f64,
 }
 
 impl ScalingTransformation {
-    pub fn new(scale_factor: f64) -> Self {
-        ScalingTransformation { scale_factor }
+    pub fn new(agent:Agent, constraint:dyn Constraint, scale_factor: f64) -> Self {
+        ScalingTransformation { agent, constraint, scale_factor }
     }
 }
 
+/*
 impl Transformation for ScalingTransformation {
 
-
+    /*
     fn apply(&self, agent: &mut Agent) {
         if let Some(geom) = agent.feature().geometry.clone() {
             if let Ok(scaled_geom) = geom.scale(self.scale_factor, self.scale_factor, 0.0, 0.0) {
@@ -112,6 +115,6 @@ impl Transformation for ScalingTransformation {
         } else {
             println!("Agent id={} has no geometry to scale", agent.get_id());
         }
-    }
-}
+    }*/
+}*/
 
