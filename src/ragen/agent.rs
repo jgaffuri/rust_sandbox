@@ -222,7 +222,7 @@ pub trait Constraint {
     fn compute_initial_value(&mut self);
     fn compute_current_value(&mut self);
     fn compute_goal_value(&mut self);
-    fn compute_satisfaction(&self);
+    fn compute_satisfaction(&mut self);
     fn get_transformations(&self) -> Vec<Box<dyn Transformation>>;
 
     //from 0 to 10 (satisfied)

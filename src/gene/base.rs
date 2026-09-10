@@ -69,7 +69,7 @@ impl Constraint for SizeConstraint {
         }
     }
 
-    fn compute_satisfaction(&self) {
+    fn compute_satisfaction(&mut self) {
         if self.constraint_data.agent.is_deleted() {
             self.constraint_data.statisfaction = if self.goal_area == 0.0 { 10.0 } else { 0.0 };
             return;
@@ -79,7 +79,7 @@ impl Constraint for SizeConstraint {
             return;
         }
 		self.constraint_data.statisfaction = 10.0 - 10.0 * (self.goal_area - self.current_area).abs() / self.goal_area;
-		if(self.constraint_data.statisfaction < 0.0) { self.constraint_data.statisfaction = 0.0; }
+		if self.constraint_data.statisfaction < 0.0  { self.constraint_data.statisfaction = 0.0; }
     }
 
     fn get_transformations(&self) -> Vec<Box<dyn crate::ragen::agent::Transformation>> {
