@@ -8,15 +8,18 @@ use crate::ragen::agent::{Agent, Constraint, ConstraintStruct};
 pub struct SizeConstraint {
     pub constraint_data: ConstraintStruct,
 
+    min_size:f64,
+    size_deletion:f64,
+
     initial_area:f64,
     current_area:f64,
-    //goal_area:f64,
+    goal_area:f64,
 
 }
 
 impl SizeConstraint {
 
-    pub fn new(agent:Agent) -> Self {
+    pub fn new(agent:Agent, min_size:f64, size_deletion:f64) -> Self {
         SizeConstraint {
             constraint_data: ConstraintStruct {
                 agent: agent,
@@ -25,9 +28,11 @@ impl SizeConstraint {
                 priority: 0,
                 hard: false,
             },
+            min_size: min_size,
+            size_deletion: size_deletion,
             initial_area: -1.0,
             current_area: -1.0,
-            //goal_area: -1.0,
+            goal_area: -1.0,
         }
     }
 }
@@ -43,10 +48,8 @@ impl Constraint for SizeConstraint {
     fn is_hard(&self) -> bool { false }
 
     fn compute_initial_value(&mut self) {
-        match self.constraint_data.agent.feature().geometry.area() {
-            Ok(area) => self.initial_area = area,
-            Err(e) => println!("Error: {}", e),
-        }
+        self.compute_current_value();
+        self.initial_area = self.current_area;
     }
 
     fn compute_current_value(&mut self) {
@@ -57,7 +60,13 @@ impl Constraint for SizeConstraint {
     }
 
     fn compute_goal_value(&mut self) {
-        todo!()
+        if self.initial_area <= self.size_deletion {
+            self.goal_area = 0.0;
+        } else if self.initial_area <= self.min_size {
+            self.goal_area = self.min_size;
+        } else {
+            self.goal_area = self.initial_area;
+        }
     }
 
     fn compute_satisfaction(&self) {
