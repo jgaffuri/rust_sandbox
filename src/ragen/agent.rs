@@ -160,7 +160,7 @@ impl Agent {
 
         while ts.len() > 0 {
             // pop first transformation from list
-            let t = ts.remove(0);
+            let mut t = ts.remove(0);
 
             //save current state
             if t.is_cancellable() { t.store_state(); }
@@ -278,10 +278,10 @@ pub trait Transformation {
     fn apply(&self);
 
     fn is_cancellable(&self) -> bool;
-	fn store_state(&self);	
-	fn cancel(&self);	
+	fn store_state(&mut self);	
+	fn cancel(&mut self);	
 
-    fn to_string(self) -> String;
+    fn to_string(&self) -> String;
 }
 
 // A transformation, which cannot be cancelled.
