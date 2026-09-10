@@ -104,6 +104,15 @@ impl Agent {
         if t_imp == 0.0 { self.satisfaction = 10.0; } else { self.satisfaction = t_sat / t_imp; }
     }
 
+
+    pub fn set_delete(&mut self, del:bool) {
+        self.deleted = del;
+    }
+    pub fn is_deleted(&self) -> bool {
+        self.deleted
+    }
+
+
     pub fn freeze(&mut self) {
         self.frozen = true;
     }
