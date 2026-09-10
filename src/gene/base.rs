@@ -130,7 +130,11 @@ impl Transformation for ScalingTransformation {
     }
 
     fn cancel(&mut self) {
-        todo!()
+        if let Some(stored_geom) = &self.stored_geom {
+            self.get_agent().feature().geometry = stored_geom;
+        } else {
+            println!("No stored geometry to cancel for agent id={}", self.get_agent().get_id());
+        }
     }
 
     fn to_string(&self) -> String {
