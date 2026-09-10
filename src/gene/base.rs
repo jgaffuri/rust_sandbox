@@ -93,11 +93,12 @@ pub struct ScalingTransformation {
     pub agent: Agent,
     pub constraint: Box<dyn Constraint>,
     pub scale_factor: f64,
+    pub stored_geom: Option<geos::Geometry>,
 }
 
 impl ScalingTransformation {
     pub fn new(agent:Agent, constraint:Box<dyn Constraint>, scale_factor: f64) -> Self {
-        ScalingTransformation { agent, constraint, scale_factor }
+        ScalingTransformation { agent, constraint, scale_factor, stored_geom: None }
     }
 }
 
@@ -124,7 +125,8 @@ impl Transformation for ScalingTransformation {
     fn is_cancellable(&self) -> bool { true }
 
     fn store_state(&mut self) {
-        todo!()
+        let geom = Geom::clone(&self.get_agent().feature().geometry).unwrap();
+        self.stored_geom = Some(geom);
     }
 
     fn cancel(&mut self) {
