@@ -53,7 +53,7 @@ impl Constraint for SizeConstraint {
     }
 
     fn compute_current_value(&mut self) {
-        match self.constraint_data.agent.feature().geometry.area() {
+        match self.constraint_data.agent.feature().get_geometry().area() {
             Ok(area) => self.current_area = area,
             Err(e) => println!("Error: {}", e),
         }
@@ -120,8 +120,8 @@ impl Transformation for ScalingTransformation {
 
     }
 
-    fn get_agent(&self) -> &Agent { &self.agent }
-    fn get_constraint(&self) -> &dyn Constraint { self.constraint.as_ref() }
+    fn get_agent(&mut self) -> &Agent { &self.agent }
+    fn get_constraint(&mut self) -> &dyn Constraint { self.constraint.as_ref() }
     fn is_cancellable(&self) -> bool { true }
 
     fn store_state(&mut self) {
@@ -132,7 +132,7 @@ impl Transformation for ScalingTransformation {
     fn cancel(&mut self) {
         if let Some(stored_geom) = &self.stored_geom {
             let g = Geom::clone(stored_geom).unwrap();
-            self.get_agent().feature().geometry = g;
+            self.get_agent().feature().set_geometry(g);
         } else {
             println!("No stored geometry to cancel for agent id={}", self.get_agent().get_id());
         }

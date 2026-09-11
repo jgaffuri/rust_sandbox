@@ -16,11 +16,12 @@ impl Feature {
         }
     }
 
-    fn get_geometry(&self) -> &Geometry {
+    pub fn get_geometry(&self) -> &Geometry {
         &self.geometry
     }
-    fn set_geometry(&mut self, geometry: Geometry) {
+    pub fn set_geometry(&mut self, geometry: Geometry) {
         self.geometry = geometry;
     }
 
 }
+
