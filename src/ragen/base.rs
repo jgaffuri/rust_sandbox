@@ -4,7 +4,7 @@ use gdal::vector::FieldValue;
 
 /* A feature in the vector dataset: a geometry and associated attributes */
 pub struct Feature {
-    pub geometry: Geometry,
+    geometry: Geometry,
     pub attributes: HashMap<String, FieldValue>,
 }
 
@@ -15,4 +15,12 @@ impl Feature {
             attributes: HashMap::new(),
         }
     }
+
+    fn get_geometry(&self) -> &Geometry {
+        &self.geometry
+    }
+    fn set_geometry(&mut self, geometry: Geometry) {
+        self.geometry = geometry;
+    }
+
 }

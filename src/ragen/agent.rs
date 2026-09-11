@@ -46,7 +46,7 @@ impl Agent {
         &self.components
     }
 
-    pub fn feature(&self) -> &Feature {
+    pub fn feature(&mut self) -> &Feature {
         &self.feature
     }
 

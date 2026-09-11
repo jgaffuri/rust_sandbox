@@ -131,7 +131,8 @@ impl Transformation for ScalingTransformation {
 
     fn cancel(&mut self) {
         if let Some(stored_geom) = &self.stored_geom {
-            self.get_agent().feature().geometry = stored_geom;
+            let g = Geom::clone(stored_geom).unwrap();
+            self.get_agent().feature().geometry = g;
         } else {
             println!("No stored geometry to cancel for agent id={}", self.get_agent().get_id());
         }
